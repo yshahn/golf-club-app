@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="골통회" />
+  <meta name="theme-color" content="#0a0f0a" />
+  <title>⛳ 골통회</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0f0a; color: #e8f0e8; font-family: Georgia, serif; }
+    #app { max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; }
+    .header { background: linear-gradient(135deg, #0d2b0d, #1a4a1a, #0d2b0d); padding: 16px 20px; border-bottom: 1px solid #2a4a2a; display: flex; justify-content: space-between; align-items: center; }
+    .header-left {}
+    .header-profile { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .header-avatar { width: 46px; height: 46px; border-radius: 50%; border: 2px solid #7dba7d; display: flex; align-items: center; justify-content: center; font-size: 24px; background: #0d2b0d; }
+    .header-ptitle { font-size: 10px; color: #7dba7d; font-family: sans-serif; text-align: center; line-height: 1.4; }
+    .header h1 { font-size: 22px; color: #7dba7d; letter-spacing: 2px; }
+    .header p { font-size: 11px; color: #4a7a4a; letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; }
+    .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #0d1a0d; border-top: 1px solid #2a4a2a; display: flex; z-index: 100; }
+    .nav-item { flex: 1; padding: 10px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; border-top: 2px solid transparent; transition: all 0.2s; }
+    .nav-item.active { background: rgba(125,186,125,0.1); border-top-color: #7dba7d; }
+    .nav-item span:first-child { font-size: 18px; }
+    .nav-item span:last-child { font-size: 10px; color: #4a7a4a; font-family: sans-serif; }
+    .nav-item.active span:last-child { color: #7dba7d; }
+    .content { padding: 16px; }
+    .card { background: #0f1f0f; border: 1px solid #2a4a2a; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .card.green-left { border-left: 3px solid #7dba7d; }
+    .sec-title { font-size: 13px; color: #4a7a4a; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; font-family: sans-serif; font-weight: 600; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: linear-gradient(135deg, #0d2b0d, #122212); border: 1px solid #2a5a2a; border-radius: 10px; padding: 14px; }
+    .stat-num { font-size: 28px; font-weight: bold; color: #7dba7d; }
+    .stat-label { font-size: 11px; color: #4a7a4a; margin-top: 4px; font-family: sans-serif; }
+    .btn { background: linear-gradient(135deg, #2a5a2a, #3a7a3a); color: #b8eab8; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: sans-serif; }
+    .btn-cancel { background: linear-gradient(135deg, #5a2a2a, #7a3a3a); color: #f0b8b8; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: sans-serif; }
+    .btn-outline { background: transparent; color: #7dba7d; border: 1px solid #3a6a3a; border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 12px; font-family: sans-serif; }
+    .btn-full { width: 100%; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: bold; font-family: sans-serif; cursor: pointer; }
+    .btn-disabled { background: #1a2a1a; color: #4a7a4a; border: 1px solid #2a4a2a; cursor: not-allowed; }
+    input, select, textarea { width: 100%; background: #0d1a0d; border: 1px solid #2a4a2a; border-radius: 8px; color: #e8f0e8; padding: 8px 12px; font-size: 13px; font-family: sans-serif; box-sizing: border-box; margin-bottom: 8px; }
+    textarea { resize: none; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
+    .modal-box { background: #0f1f0f; border: 1px solid #2a5a2a; border-radius: 16px 16px 0 0; padding: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; font-family: sans-serif; }
+    .badge-green { background: #0a2a0a; color: #7dba7d; border: 1px solid #2a5a2a; }
+    .badge-orange { background: #2a1a00; color: #ffaa44; border: 1px solid #5a3a00; }
+    .badge-blue { background: #0a0a2a; color: #7dacff; border: 1px solid #2a2a5a; }
+    .badge-red { background: #2a0a0a; color: #ff7070; border: 1px solid #5a2a2a; }
+    .badge-sky { background: #0a1a2a; color: #7db8ff; border: 1px solid #2a4a6a; }
+    .badge-gray { background: #1a1a1a; color: #888; border: 1px solid #333; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1a3a1a; }
+    .row:last-child { border-bottom: none; }
+    .progress-wrap { margin-bottom: 4px; }
+    .progress-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; font-family: sans-serif; color: #4a7a4a; }
+    .progress-bar { height: 6px; background: #1a3a1a; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .two-col input { margin: 0; }
+    .welcome { background: linear-gradient(135deg, #0d2b0d, #1a3a1a); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; border: 1px solid #2a5a2a; }
+    .loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+    .divider { border-color: #1a3a1a; margin: 12px 0; }
+    .member-avatar { font-size: 28px; width: 44px; height: 44px; background: #0d2b0d; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #2a5a2a; flex-shrink: 0; }
+    .applicant-chip { display: flex; align-items: center; gap: 5px; border-radius: 20px; padding: 5px 10px; font-size: 12px; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+
+<!-- ✅ 여기에 Firebase 설정값을 붙여넣으세요 -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "여기에_붙여넣기",
+    authDomain: "여기에_붙여넣기",
+    projectId: "여기에_붙여넣기",
+    storageBucket: "여기에_붙여넣기",
+    messagingSenderId: "여기에_붙여넣기",
+    appId: "여기에_붙여넣기"
+  };
+
+  // ✅ 본인 이름으로 바꾸세요 (회원마다 다르게 설정)
+  const MY_NAME = "내이름";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 상태
+  let state = { tab: "home", members: [], events: [], scores: [], posts: [], dues: [], likedPosts: [], showModal: null, newEvent: {}, newScore: {}, newPost: { category: "일반" }, newMember: { role: "회원" }, newDue: {} };
+  const ANNUAL_FEE = 250; // 연회비 달러
+
+  // Firebase 구독
+  onSnapshot(collection(db, "members"), s => { state.members = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); });
+  onSnapshot(query(collection(db, "events"), orderBy("date", "desc")), s => { state.events = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); });
+  onSnapshot(query(collection(db, "scores"), orderBy("date", "desc")), s => { state.scores = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); });
+  onSnapshot(query(collection(db, "posts"), orderBy("date", "desc")), s => { state.posts = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); });
+  onSnapshot(collection(db, "dues"), s => { state.dues = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); });
+
+  // 헬퍼
+  const getAvg = name => { const ms = state.scores.filter(s => s.memberName === name); return ms.length ? Math.round(ms.reduce((a, b) => a + b.score, 0) / ms.length) : "-"; };
+  const isApplied = ev => (ev.applicants || []).includes(MY_NAME);
+  const bestScore = () => state.scores.length ? Math.min(...state.scores.map(s => s.score)) : "-";
+  const bestPlayer = () => { const b = bestScore(); return b !== "-" ? (state.scores.find(s => s.score === b) || {}).memberName || "-" : "-"; };
+
+  const badgeClass = t => t === "모집중" ? "badge-green" : t === "완료" ? "badge-gray" : t === "마감" ? "badge-red" : t === "신청완료" ? "badge-sky" : t === "공지" ? "badge-orange" : t === "후기" ? "badge-green" : t === "팁" ? "badge-blue" : "badge-gray";
+
+  const progressColor = pct => pct >= 100 ? "#ff7070" : pct >= 75 ? "#ffaa44" : "#7dba7d";
+
+  // 액션
+  async function toggleApply(ev) {
+    const ref = doc(db, "events", ev.id);
+    const applicants = ev.applicants || [];
+    if (applicants.includes(MY_NAME)) await updateDoc(ref, { applicants: applicants.filter(a => a !== MY_NAME) });
+    else if (applicants.length < ev.maxParticipants) await updateDoc(ref, { applicants: [...applicants, MY_NAME] });
+  }
+
+  async function addEvent() {
+    const e = state.newEvent;
+    if (!e.title || !e.course || !e.date) return alert("제목, 골프장, 날짜는 필수예요!");
+    await addDoc(collection(db, "events"), { ...e, maxParticipants: parseInt(e.maxParticipants) || 8, fee: parseInt(e.fee) || 0, organizer: MY_NAME, applicants: [MY_NAME], status: "모집중", date: e.date });
+    state.newEvent = {}; state.showModal = null; render();
+  }
+
+  async function addScore() {
+    const s = state.newScore;
+    if (!s.memberName || !s.score) return alert("회원과 스코어를 입력해주세요!");
+    await addDoc(collection(db, "scores"), {
+      ...s,
+      score: parseInt(s.score),
+      courseRating: parseFloat(s.courseRating) || null,
+      slopeRating: parseFloat(s.slopeRating) || 113,
+      date: s.date || new Date().toISOString().slice(0,10)
+    });
+    // 스코어 추가 후 USGA 핸디캡 자동 재계산
+    setTimeout(() => autoUpdateHandicap(s.memberName), 1000);
+    state.newScore = {}; state.showModal = null; render();
+  }
+
+  async function addPost() {
+    const p = state.newPost;
+    if (!p.title || !p.content) return alert("제목과 내용을 입력해주세요!");
+    await addDoc(collection(db, "posts"), { ...p, author: MY_NAME, date: new Date().toISOString().slice(0,10), likes: 0 });
+    state.newPost = { category: "일반" }; state.showModal = null; render();
+  }
+
+  // USGA 핸디캡 자동 계산
+  function calcUSGAHandicap(memberName) {
+    const ms = state.scores.filter(s => s.memberName === memberName && s.courseRating && s.slopeRating);
+    if (ms.length < 3) return null; // 최소 3라운드 필요
+    // Differential 계산
+    const diffs = ms.map(s => {
+      const diff = (s.score - parseFloat(s.courseRating)) * 113 / parseFloat(s.slopeRating);
+      return Math.round(diff * 10) / 10;
+    }).sort((a,b) => a-b);
+    // 라운드 수에 따라 best N개 사용
+    const count = diffs.length;
+    let useCount = count >= 20 ? 8 : count >= 16 ? 6 : count >= 12 ? 5 : count >= 9 ? 4 : count >= 7 ? 3 : count >= 5 ? 2 : 1;
+    const best = diffs.slice(0, useCount);
+    const avg = best.reduce((a,b) => a+b, 0) / best.length;
+    return Math.round(avg * 0.96 * 10) / 10;
+  }
+
+  async function autoUpdateHandicap(memberName) {
+    const handi = calcUSGAHandicap(memberName);
+    if (handi === null) return;
+    const member = state.members.find(m => m.name === memberName);
+    if (!member) return;
+    if (member.handicap === handi) return; // 변동 없으면 패스
+    const history = member.handicapHistory || [];
+    history.push({ handicap: member.handicap, date: new Date().toISOString().slice(0,10), auto: false });
+    await updateDoc(doc(db, "members", member.id), { handicap: handi, handicapHistory: history, lastAutoCalc: new Date().toISOString().slice(0,10) });
+  }
+
+  async function updateHandicap(memberId, newHandicap, memberName) {
+    const ref = doc(db, "members", memberId);
+    const oldMember = state.members.find(m => m.id === memberId);
+    const history = oldMember.handicapHistory || [];
+    history.push({ handicap: oldMember.handicap, date: new Date().toISOString().slice(0,10) });
+    await updateDoc(ref, { handicap: parseFloat(parseFloat(newHandicap).toFixed(1)), handicapHistory: history });
+    state.showModal = null; render();
+  }
+
+  async function addDue() {
+    const d = state.newDue;
+    if (!d.memberName || !d.year) return alert("회원과 연도를 선택해주세요!");
+    // 이미 납부 기록이 있는지 확인
+    const exists = state.dues.find(x => x.memberName === d.memberName && x.year === d.year);
+    if (exists) return alert("이미 납부 기록이 있습니다!");
+    await addDoc(collection(db, "dues"), {
+      memberName: d.memberName,
+      year: d.year,
+      amount: ANNUAL_FEE,
+      paidDate: d.paidDate || new Date().toISOString().slice(0,10),
+      note: d.note || ""
+    });
+    state.newDue = {}; state.showModal = null; render();
+  }
+
+  async function deleteDue(dueId) {
+    if (!confirm("납부 기록을 삭제할까요?")) return;
+    const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+    await deleteDoc(doc(db, "dues", dueId));
+  }
+
+  async function addMember() {
+    const m = state.newMember;
+    if (!m.name) return alert("이름을 입력해주세요!");
+    await addDoc(collection(db, "members"), { ...m, handicap: parseFloat(parseFloat(m.handicap).toFixed(1)) || 36.0, joined: new Date().toISOString().slice(0,7) });
+    state.newMember = { role: "회원" }; state.showModal = null; render();
+  }
+
+  async function toggleLike(post) {
+    if (state.likedPosts.includes(post.id)) {
+      state.likedPosts = state.likedPosts.filter(id => id !== post.id);
+      await updateDoc(doc(db, "posts", post.id), { likes: (post.likes || 0) - 1 });
+    } else {
+      state.likedPosts.push(post.id);
+      await updateDoc(doc(db, "posts", post.id), { likes: (post.likes || 0) + 1 });
+    }
+    render();
+  }
+
+  // 렌더링
+  function render() {
+    const root = document.getElementById("app");
+    const cu = state.members.find(m => m.name === MY_NAME);
+    const upcoming = state.events.filter(e => e.status === "모집중");
+    const bs = bestScore(); const bp = bestPlayer();
+
+    root.innerHTML = `
+      <div class="header">
+        <div class="header-left">
+          <h1>⛳ 골통회</h1>
+          <p>골프 동호회 · Since 2015</p>
+        </div>
+        <div class="header-profile">
+          <div class="header-avatar">🏌️</div>
+          <div class="header-ptitle">초대 회장<br>한용수</div>
+        </div>
+      </div>
+
+      <div id="content">
+        ${state.tab === "home" ? renderHome(cu, upcoming, bs, bp) : ""}
+        ${state.tab === "events" ? renderEvents(upcoming) : ""}
+        ${state.tab === "members" ? renderMembers() : ""}
+        ${state.tab === "handicap" ? renderHandicap() : ""}
+        ${state.tab === "scores" ? renderScores() : ""}
+        ${state.tab === "board" ? renderBoard() : ""}
+        ${state.tab === "dues" ? renderDues() : ""}
+      </div>
+
+      ${state.showModal ? renderModal() : ""}
+
+      <nav class="nav">
+        ${[["home","⛳","홈"],["events","🎯","이벤트"],["dues","💰","회비"],["handicap","🏅","핸디"],["scores","📊","스코어"]].map(([id,icon,label]) => `
+          <div class="nav-item ${state.tab===id?"active":""}" onclick="setTab('${id}')">
+            <span>${icon}</span><span>${label}</span>
+          </div>`).join("")}
+      </nav>
+    `;
+    bindEvents();
+  }
+
+  function renderHome(cu, upcoming, bs, bp) {
+    return `
+      <div class="content">
+        <div class="welcome">
+          <span style="font-size:32px">🏌️</span>
+          <div>
+            <div style="font-size:15px;color:#c8e8c8">안녕하세요, <strong style="color:#7dba7d">${MY_NAME}</strong>님 👋</div>
+            ${cu ? `<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-top:2px">핸디캡 ${parseFloat(cu.handicap).toFixed(1)} · ${cu.role}</div>` : ""}
+          </div>
+        </div>
+        <div class="stat-grid">
+          ${[["members","총 회원수"],[upcoming.length,"모집중 이벤트"],[bs,"최저 스코어"],[state.scores.length,"스코어 기록"]].map(([n,l],i) => `
+            <div class="stat-card">
+              <div class="stat-num">${i===0?state.members.length:n}</div>
+              <div class="stat-label">${l}</div>
+            </div>`).join("")}
+        </div>
+        <div class="card">
+          <div class="sec-title">🎯 모집중인 이벤트</div>
+          ${upcoming.length === 0 ? `<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">모집중인 이벤트가 없습니다</div>` :
+            upcoming.map(ev => `
+              <div class="row" onclick="showDetail('${ev.id}')" style="cursor:pointer">
+                <div>
+                  <div style="font-size:14px;color:#c8e8c8;margin-bottom:3px">${ev.title}</div>
+                  <div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">${ev.date} · ${ev.course}</div>
+                </div>
+                ${isApplied(ev) ? `<span class="badge badge-sky">✓ 신청완료</span>` : `<span class="badge badge-green">${(ev.applicants||[]).length}/${ev.maxParticipants}명</span>`}
+              </div>`).join("")}
+        </div>
+        ${bp !== "-" ? `
+        <div class="card">
+          <div class="sec-title">🏆 이달의 베스트</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:36px">🥇</span>
+            <div>
+              <div style="font-size:18px;color:#ffd700;font-weight:bold">${bp}</div>
+              <div style="font-size:13px;color:#7dba7d">베스트 스코어 ${bs}타</div>
+            </div>
+          </div>
+        </div>` : ""}
+      </div>`;
+  }
+
+  function renderEventCard(ev) {
+    const applied = isApplied(ev);
+    const cnt = (ev.applicants||[]).length;
+    const full = cnt >= ev.maxParticipants;
+    const pct = Math.round(cnt / ev.maxParticipants * 100);
+    const pc = progressColor(pct);
+    return `
+      <div class="card ${ev.status==='모집중'?'green-left':''}" onclick="showDetail('${ev.id}')" style="cursor:pointer">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <span class="badge ${badgeClass(ev.status==='모집중'&&full?'마감':ev.status)}">${ev.status==='모집중'&&full?'모집마감':ev.status}</span>
+          ${applied&&ev.status==='모집중'?`<span class="badge badge-sky">✓ 신청완료</span>`:""}
+        </div>
+        <div style="font-size:16px;color:#c8e8c8;font-weight:bold;margin-bottom:4px">${ev.title}</div>
+        <div style="font-size:13px;color:#7dba7d;font-family:sans-serif">📍 ${ev.course}</div>
+        <div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin:2px 0 10px">📅 ${ev.date}${ev.teeTime?` · ${ev.teeTime} 티오프`:""} · 💰 ${ev.fee>0?ev.fee.toLocaleString()+"원":"무료"}</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>신청 현황</span><span style="color:${pc};font-weight:bold">${cnt} / ${ev.maxParticipants}명</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${pc}"></div></div>
+        </div>
+        ${ev.status==='모집중'?`
+        <button class="${applied?'btn-cancel btn':'btn'} btn-full" style="margin-top:12px" onclick="event.stopPropagation();applyEvent('${ev.id}')">
+          ${applied?"❌ 신청 취소":full?"모집 마감":"✅ 참가 신청"}
+        </button>`:""}
+      </div>`;
+  }
+
+  function renderEvents() {
+    return `
+      <div class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="sec-title" style="margin:0">라운딩 이벤트</div>
+          <button class="btn" onclick="openModal('addEvent')">+ 이벤트 등록</button>
+        </div>
+        ${["모집중","종료"].map(group => {
+          const filtered = state.events.filter(e => group==="모집중"?e.status==="모집중":e.status!=="모집중");
+          if (!filtered.length) return "";
+          return `<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;letter-spacing:1px;margin-bottom:8px">${group==="모집중"?"🟢 모집중":"⬜ 종료된 이벤트"}</div>${filtered.map(renderEventCard).join("")}`;
+        }).join("")}
+      </div>`;
+  }
+
+  function renderHandicap() {
+    const ranked = [...state.members].filter(m => m.handicap).sort((a,b) => a.handicap - b.handicap);
+    const medalColor = i => i===0?"#ffd700":i===1?"#c0c0c0":i===2?"#cd7f32":"#4a7a4a";
+    const medalBg = i => i===0?"#3a2a00":i===1?"#1a1a2a":i===2?"#1a1a0a":"#0d1a0d";
+    return `
+      <div class="content">
+        <div style="background:#0d2b0d;border:1px solid #2a5a2a;border-radius:10px;padding:12px;margin-bottom:12px;font-family:sans-serif">
+          <div style="font-size:12px;color:#7dba7d;font-weight:bold;margin-bottom:4px">🤖 USGA 자동계산 방식</div>
+          <div style="font-size:11px;color:#4a7a4a;line-height:1.6">스코어 입력 시 코스레이팅·슬로프레이팅을 함께 입력하면<br>핸디캡이 자동으로 계산·업데이트됩니다.<br>최소 3라운드 이상 필요 · Best Differential 평균 × 0.96</div>
+        </div>
+        <div class="card">
+          <div class="sec-title">🏅 핸디캡 랭킹</div>
+          ${ranked.map((m,i) => `
+            <div class="row">
+              <div style="display:flex;align-items:center;gap:10px;flex:1">
+                <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:${medalBg(i)};border:1px solid ${medalColor(i)};color:${medalColor(i)};font-family:sans-serif;font-weight:bold;flex-shrink:0">${i+1}</div>
+                <div>
+                  <div style="font-size:14px;color:#c8e8c8">${m.name}</div>
+                  <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">${m.role}</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="text-align:right">
+                  <div style="font-size:22px;color:#7dba7d;font-weight:bold">${parseFloat(m.handicap).toFixed(1)}</div>
+                  <div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">핸디캡</div>
+                </div>
+                <button onclick="openModal('editHandi_${m.id}')" style="background:#0d2b0d;border:1px solid #2a5a2a;color:#7dba7d;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:sans-serif">수정</button>
+              </div>
+            </div>
+            ${(() => { const auto = calcUSGAHandicap(m.name); return auto !== null && auto !== m.handicap ? `<div style="font-size:11px;color:#ffaa44;font-family:sans-serif;margin-top:4px;padding:4px 8px;background:#2a1a00;border-radius:6px">⚡ USGA 계산값: ${auto} (스코어 추가 시 자동 반영)</div>` : ""; })()}
+          </div>`).join("")}
+        </div>
+        <div class="card">
+          <div class="sec-title">📈 핸디캡 변동 히스토리</div>
+          ${ranked.filter(m => (m.handicapHistory||[]).length > 0).map(m => `
+            <div style="margin-bottom:14px">
+              <div style="font-size:14px;color:#c8e8c8;margin-bottom:6px;font-weight:bold">${m.name} <span style="font-size:12px;color:#7dba7d">현재 ${m.handicap}</span></div>
+              ${[...(m.handicapHistory||[])].reverse().slice(0,5).map(h => `
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1a3a1a;font-family:sans-serif">
+                  <span style="font-size:12px;color:#4a7a4a">${h.date}</span>
+                  <span style="font-size:12px;color:#c8e8c8">${h.handicap} → <span style="color:#7dba7d">${m.handicap}</span></span>
+                </div>`).join("")}
+            </div>`).join("") || `<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">아직 변동 이력이 없습니다</div>`}
+        </div>
+      </div>`;
+  }
+
+  function renderMembers() {
+    return `
+      <div class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="sec-title" style="margin:0">회원 목록</div>
+          <button class="btn" onclick="openModal('addMember')">+ 추가</button>
+        </div>
+        ${state.members.map(m => `
+          <div class="card" style="border-left:${m.name===MY_NAME?"3px solid #7dba7d":"1px solid #2a4a2a"}">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="member-avatar">⛳</div>
+              <div style="flex:1">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
+                  <span style="font-size:15px;color:#c8e8c8;font-weight:bold">${m.name}</span>
+                  <span class="badge badge-blue">${m.role}</span>
+                  ${m.name===MY_NAME?`<span style="font-size:10px;color:#7dba7d;font-family:sans-serif">나</span>`:""}
+                </div>
+                <div style="display:flex;gap:14px;font-family:sans-serif">
+                  <span style="font-size:12px;color:#7dba7d">핸디 ${parseFloat(m.handicap).toFixed(1)}</span>
+                  <span style="font-size:12px;color:#4a7a4a">평균 ${getAvg(m.name)}타</span>
+                </div>
+              </div>
+            </div>
+          </div>`).join("")}
+      </div>`;
+  }
+
+  function renderScores() {
+    const lb = state.members.map(m => ({ ...m, avg: getAvg(m.name), cnt: state.scores.filter(s=>s.memberName===m.name).length })).filter(m=>m.cnt>0).sort((a,b)=>a.avg-b.avg);
+    const medalColor = i => i===0?"#ffd700":i===1?"#c0c0c0":i===2?"#cd7f32":"#4a7a4a";
+    const medalBg = i => i===0?"#3a2a00":i===1?"#1a1a2a":i===2?"#1a1a0a":"#0d1a0d";
+    return `
+      <div class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="sec-title" style="margin:0">스코어 기록</div>
+          <button class="btn" onclick="openModal('addScore')">+ 기록</button>
+        </div>
+        <div class="card">
+          <div class="sec-title">🏆 리더보드</div>
+          ${lb.map((m,i) => `
+            <div class="row">
+              <div style="display:flex;align-items:center;gap:12px;flex:1">
+                <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:${medalBg(i)};border:1px solid ${medalColor(i)};color:${medalColor(i)};font-family:sans-serif;font-weight:bold;flex-shrink:0">${i+1}</div>
+                <div>
+                  <div style="font-size:14px;color:#c8e8c8">${m.name}</div>
+                  <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">${m.cnt}라운드</div>
+                </div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:20px;color:#7dba7d;font-weight:bold">${m.avg}</div>
+                <div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">평균타</div>
+              </div>
+            </div>`).join("")}
+        </div>
+        <div class="card">
+          <div class="sec-title">📝 최근 기록</div>
+          ${state.scores.slice(0,10).map(s => `
+            <div class="row">
+              <div>
+                <span style="font-size:14px;color:#c8e8c8">${s.memberName}</span>
+                <span style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-left:8px">${s.course||""}</span>
+              </div>
+              <div style="text-align:right">
+                <span style="font-size:18px;color:#7dba7d;font-weight:bold">${s.score}</span>
+                <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">${s.date}</div>
+              </div>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  }
+
+  function renderDues() {
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear, currentYear-1, currentYear-2];
+    const selYear = state.duesYear || currentYear;
+
+    const paidThisYear = state.dues.filter(d => d.year == selYear);
+    const paidNames = paidThisYear.map(d => d.memberName);
+    const unpaidMembers = state.members.filter(m => !paidNames.includes(m.name));
+    const totalCollected = paidThisYear.length * ANNUAL_FEE;
+    const totalExpected = state.members.length * ANNUAL_FEE;
+    const pct = state.members.length ? Math.round(paidThisYear.length / state.members.length * 100) : 0;
+    const pcColor = pct >= 100 ? "#7dba7d" : pct >= 60 ? "#ffaa44" : "#ff7070";
+
+    return `
+      <div class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="sec-title" style="margin:0">💰 회비 관리</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select onchange="setDuesYear(this.value)" style="width:auto;margin:0;padding:6px 10px;font-size:12px">
+              ${years.map(y => `<option value="${y}" ${selYear==y?"selected":""}>${y}년</option>`).join("")}
+            </select>
+            <button class="btn" onclick="openModal('addDue')">+ 납부 등록</button>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#0d2b0d,#122212);border:1px solid #2a5a2a;border-radius:12px;padding:16px;margin-bottom:12px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+            <div style="text-align:center">
+              <div style="font-size:22px;font-weight:bold;color:#7dba7d">${paidThisYear.length}/${state.members.length}</div>
+              <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">납부 완료</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:22px;font-weight:bold;color:#ffd700">$${totalCollected}</div>
+              <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">수납 금액</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:22px;font-weight:bold;color:#ff7070">$${totalExpected - totalCollected}</div>
+              <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">미납 금액</div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">납부율</span>
+              <span style="font-size:12px;color:${pcColor};font-weight:bold;font-family:sans-serif">${pct}%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pcColor}"></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="sec-title" style="color:#7dba7d">✅ 납부 완료 (${paidThisYear.length}명)</div>
+          ${paidThisYear.length === 0 ? `<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">납부자가 없습니다</div>` :
+            paidThisYear.map(d => `
+              <div class="row">
+                <div>
+                  <div style="font-size:14px;color:#c8e8c8">${d.memberName}</div>
+                  <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">${d.paidDate} 납부${d.note?` · ${d.note}`:""}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:15px;color:#7dba7d;font-weight:bold">$${d.amount}</span>
+                  <button onclick="deleteDue('${d.id}')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:16px">🗑</button>
+                </div>
+              </div>`).join("")}
+        </div>
+
+        ${unpaidMembers.length > 0 ? `
+        <div class="card" style="border-left:3px solid #ff7070">
+          <div class="sec-title" style="color:#ff7070">❌ 미납 (${unpaidMembers.length}명)</div>
+          ${unpaidMembers.map(m => `
+            <div class="row">
+              <div style="font-size:14px;color:#c8e8c8">${m.name}</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:13px;color:#ff7070;font-family:sans-serif">$${ANNUAL_FEE} 미납</span>
+                <button onclick="quickPay('${m.name}')" style="background:#0d2b0d;border:1px solid #2a5a2a;color:#7dba7d;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-family:sans-serif">납부처리</button>
+              </div>
+            </div>`).join("")}
+        </div>` : `<div class="card" style="border-left:3px solid #7dba7d;text-align:center;padding:20px"><div style="font-size:24px">🎉</div><div style="color:#7dba7d;font-family:sans-serif;margin-top:8px">전원 납부 완료!</div></div>`}
+      </div>`;
+  }
+
+  function renderBoard() {
+    return `
+      <div class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="sec-title" style="margin:0">게시판</div>
+          <button class="btn" onclick="openModal('addPost')">+ 글쓰기</button>
+        </div>
+        ${state.posts.map(p => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span class="badge ${badgeClass(p.category)}">${p.category}</span>
+              <span style="font-size:11px;color:#4a7a4a;font-family:sans-serif">${p.date}</span>
+            </div>
+            <div style="font-size:15px;color:#c8e8c8;font-weight:bold;margin-bottom:6px">${p.title}</div>
+            <div style="font-size:13px;color:#7a9a7a;line-height:1.6;margin-bottom:10px;font-family:sans-serif">${p.content}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">${p.author}</span>
+              <button onclick="likePost('${p.id}')" style="background:none;border:none;cursor:pointer;color:${state.likedPosts.includes(p.id)?'#ff6666':'#4a7a4a'};font-size:13px;font-family:sans-serif;display:flex;align-items:center;gap:4px">
+                ${state.likedPosts.includes(p.id)?"❤️":"🤍"} ${p.likes||0}
+              </button>
+            </div>
+          </div>`).join("")}
+      </div>`;
+  }
+
+  function renderModal() {
+    const m = state.showModal;
+    if (m === "addEvent") return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">🎯 이벤트 등록</div>
+          <input placeholder="이벤트 제목" id="ev_title" value="${state.newEvent.title||""}" oninput="updateNew('event','title',this.value)" />
+          <input placeholder="골프장 이름" id="ev_course" value="${state.newEvent.course||""}" oninput="updateNew('event','course',this.value)" />
+          <div class="two-col">
+            <input type="date" id="ev_date" value="${state.newEvent.date||""}" oninput="updateNew('event','date',this.value)" />
+            <input type="time" id="ev_tee" value="${state.newEvent.teeTime||""}" oninput="updateNew('event','teeTime',this.value)" />
+          </div>
+          <div class="two-col">
+            <input type="number" placeholder="최대 인원" value="${state.newEvent.maxParticipants||""}" oninput="updateNew('event','maxParticipants',this.value)" />
+            <input type="number" placeholder="참가비 (원)" value="${state.newEvent.fee||""}" oninput="updateNew('event','fee',this.value)" />
+          </div>
+          <input type="date" placeholder="신청 마감일" value="${state.newEvent.deadline||""}" oninput="updateNew('event','deadline',this.value)" />
+          <textarea rows="3" placeholder="이벤트 설명" oninput="updateNew('event','description',this.value)">${state.newEvent.description||""}</textarea>
+          <div style="display:flex;gap:8px"><button class="btn" onclick="submitEvent()">등록하기</button><button class="btn-outline" onclick="closeModal()">취소</button></div>
+        </div>
+      </div>`;
+
+    if (m && m.startsWith("detail_")) {
+      const ev = state.events.find(e => e.id === m.replace("detail_",""));
+      if (!ev) return "";
+      const applied = isApplied(ev); const cnt = (ev.applicants||[]).length; const full = cnt >= ev.maxParticipants; const pct = Math.round(cnt/ev.maxParticipants*100); const pc = progressColor(pct);
+      return `
+        <div class="modal-bg" onclick="closeModal()">
+          <div class="modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div style="font-size:17px;color:#7dba7d;font-weight:bold">${ev.title}</div>
+              <button onclick="closeModal()" style="background:none;border:none;color:#4a7a4a;font-size:22px;cursor:pointer">×</button>
+            </div>
+            <div style="background:#0d2b0d;border-radius:10px;padding:14px;margin-bottom:14px">
+              <div style="font-size:15px;color:#c8e8c8;margin-bottom:8px;font-weight:bold">📍 ${ev.course}</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                ${[["📅 날짜",ev.date],["⏰ 티오프",ev.teeTime||"미정"],["💰 참가비",ev.fee>0?ev.fee.toLocaleString()+"원":"무료"],["📌 마감일",ev.deadline||"미정"]].map(([l,v])=>`<div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-bottom:2px">${l}</div><div style="font-size:13px;color:#c8e8c8;font-family:sans-serif">${v}</div></div>`).join("")}
+              </div>
+            </div>
+            ${ev.description?`<div style="font-size:13px;color:#7a9a7a;line-height:1.7;font-family:sans-serif;padding:12px 0;border-top:1px solid #1a3a1a;border-bottom:1px solid #1a3a1a;margin-bottom:14px">${ev.description}</div>`:""}
+            <div style="margin-bottom:14px">
+              <div class="progress-label"><span style="color:#c8e8c8">신청 현황</span><span style="color:${pc};font-weight:bold">${cnt} / ${ev.maxParticipants}명</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${pc}"></div></div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+                ${(ev.applicants||[]).map(name=>`<div class="applicant-chip" style="background:${name===MY_NAME?"#1a3a1a":"#0d1a0d"};border:1px solid ${name===MY_NAME?"#3a7a3a":"#2a4a2a"};color:${name===MY_NAME?"#7dba7d":"#c8e8c8"}">${name}${name===MY_NAME?` <span style="font-size:10px;color:#7dacff">나</span>`:""}</div>`).join("")}
+                ${cnt===0?`<span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">아직 신청자가 없습니다</span>`:""}
+              </div>
+            </div>
+            <div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;padding:10px 0;border-top:1px solid #1a3a1a;margin-bottom:14px">주최: <span style="color:#c8e8c8">${ev.organizer}</span></div>
+            ${ev.status==="모집중"?`<button class="${applied?"btn-cancel":"btn"} btn-full" onclick="applyEvent('${ev.id}')">${applied?"❌  신청 취소하기":full?"모집이 마감되었습니다":"✅  참가 신청하기"}</button>`:""}
+          </div>
+        </div>`;
+    }
+
+    if (m === "addScore") return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">스코어 추가</div>
+          <select onchange="updateNew('score','memberName',this.value)">
+            <option value="">회원 선택</option>
+            ${state.members.map(m=>`<option value="${m.name}" ${state.newScore.memberName===m.name?"selected":""}>${m.name}</option>`).join("")}
+          </select>
+          <input type="number" placeholder="스코어 (타)" value="${state.newScore.score||""}" oninput="updateNew('score','score',this.value)" />
+          <input placeholder="골프장 이름" value="${state.newScore.course||""}" oninput="updateNew('score','course',this.value)" />
+          <div class="two-col">
+            <input type="number" step="0.1" placeholder="코스레이팅 (예: 71.5)" value="${state.newScore.courseRating||""}" oninput="updateNew('score','courseRating',this.value)" />
+            <input type="number" placeholder="슬로프레이팅 (예: 125)" value="${state.newScore.slopeRating||""}" oninput="updateNew('score','slopeRating',this.value)" />
+          </div>
+          <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:8px">💡 코스레이팅/슬로프레이팅은 스코어카드에서 확인하세요</div>
+          <input type="date" value="${state.newScore.date||""}" oninput="updateNew('score','date',this.value)" />
+          <div style="display:flex;gap:8px"><button class="btn" onclick="submitScore()">기록</button><button class="btn-outline" onclick="closeModal()">취소</button></div>
+        </div>
+      </div>`;
+
+    if (m === "addPost") return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">글쓰기</div>
+          <select onchange="updateNew('post','category',this.value)">
+            ${["일반","공지","후기","팁"].map(c=>`<option value="${c}" ${state.newPost.category===c?"selected":""}>${c}</option>`).join("")}
+          </select>
+          <input placeholder="제목" value="${state.newPost.title||""}" oninput="updateNew('post','title',this.value)" />
+          <textarea rows="4" placeholder="내용을 입력하세요..." oninput="updateNew('post','content',this.value)">${state.newPost.content||""}</textarea>
+          <div style="display:flex;gap:8px"><button class="btn" onclick="submitPost()">게시</button><button class="btn-outline" onclick="closeModal()">취소</button></div>
+        </div>
+      </div>`;
+
+    if (m && m.startsWith("editHandi_")) {
+      const memberId = m.replace("editHandi_","");
+      const member = state.members.find(mem => mem.id === memberId);
+      if (!member) return "";
+      return `
+        <div class="modal-bg" onclick="closeModal()">
+          <div class="modal-box" onclick="event.stopPropagation()">
+            <div style="font-size:16px;color:#7dba7d;margin-bottom:6px;font-weight:bold">🏅 핸디캡 수정</div>
+            <div style="font-size:13px;color:#4a7a4a;font-family:sans-serif;margin-bottom:16px">${member.name} · 현재 핸디캡: <span style="color:#7dba7d;font-weight:bold">${member.handicap}</span></div>
+            ${(member.handicapHistory||[]).length > 0 ? `
+            <div style="background:#0d2b0d;border-radius:8px;padding:10px;margin-bottom:12px">
+              <div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:6px">변동 이력</div>
+              ${[...(member.handicapHistory||[])].reverse().slice(0,3).map(h=>`
+                <div style="font-size:12px;color:#c8e8c8;font-family:sans-serif;padding:2px 0">${h.date}: ${h.handicap}타</div>`).join("")}
+            </div>` : ""}
+            <div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:6px">새 핸디캡</div>
+            <input type="number" step="0.1" placeholder="새 핸디캡 (예: 12.5)" id="newHandi" style="font-size:20px;text-align:center" />
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button class="btn" onclick="submitHandicap('${memberId}','${member.name}')">저장</button>
+              <button class="btn-outline" onclick="closeModal()">취소</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    if (m === "addDue") {
+      const currentYear = new Date().getFullYear();
+      const years = [currentYear, currentYear-1, currentYear+1];
+      return `
+        <div class="modal-bg" onclick="closeModal()">
+          <div class="modal-box" onclick="event.stopPropagation()">
+            <div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">💰 회비 납부 등록</div>
+            <select onchange="updateNew('due','memberName',this.value)">
+              <option value="">회원 선택</option>
+              ${state.members.map(m=>`<option value="${m.name}" ${state.newDue.memberName===m.name?"selected":""}>${m.name}</option>`).join("")}
+            </select>
+            <select onchange="updateNew('due','year',this.value)">
+              <option value="">연도 선택</option>
+              ${years.map(y=>`<option value="${y}" ${state.newDue.year==y?"selected":""}>${y}년</option>`).join("")}
+            </select>
+            <input type="date" placeholder="납부일" value="${state.newDue.paidDate||''}" oninput="updateNew('due','paidDate',this.value)" />
+            <input placeholder="메모 (선택)" value="${state.newDue.note||''}" oninput="updateNew('due','note',this.value)" />
+            <div style="background:#0d2b0d;border-radius:8px;padding:10px;margin-bottom:10px;font-family:sans-serif">
+              <div style="font-size:12px;color:#4a7a4a">납부 금액</div>
+              <div style="font-size:20px;color:#7dba7d;font-weight:bold">$${ANNUAL_FEE}</div>
+            </div>
+            <div style="display:flex;gap:8px"><button class="btn" onclick="submitDue()">등록</button><button class="btn-outline" onclick="closeModal()">취소</button></div>
+          </div>
+        </div>`;
+    }
+
+    if (m === "addMember") return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">새 회원 추가</div>
+          <input placeholder="이름" value="${state.newMember.name||""}" oninput="updateNew('member','name',this.value)" />
+          <input type="number" placeholder="핸디캡" value="${state.newMember.handicap||""}" oninput="updateNew('member','handicap',this.value)" />
+          <select onchange="updateNew('member','role',this.value)">
+            ${["회원","총무","부회장","회장"].map(r=>`<option value="${r}" ${state.newMember.role===r?"selected":""}>${r}</option>`).join("")}
+          </select>
+          <div style="display:flex;gap:8px"><button class="btn" onclick="submitMember()">추가</button><button class="btn-outline" onclick="closeModal()">취소</button></div>
+        </div>
+      </div>`;
+
+    return "";
+  }
+
+  function bindEvents() {}
+
+  // 전역 함수
+  window.setTab = t => { state.tab = t; render(); };
+  window.openModal = m => { state.showModal = m; render(); };
+  window.closeModal = () => { state.showModal = null; render(); };
+  window.showDetail = id => { state.showModal = "detail_" + id; render(); };
+  window.applyEvent = id => { const ev = state.events.find(e=>e.id===id); if(ev) toggleApply(ev); };
+  window.likePost = id => { const p = state.posts.find(p=>p.id===id); if(p) toggleLike(p); };
+  window.updateNew = (type, key, val) => { if(type==="event") state.newEvent[key]=val; else if(type==="score") state.newScore[key]=val; else if(type==="post") state.newPost[key]=val; else if(type==="member") state.newMember[key]=val; };
+  window.submitHandicap = (id, name) => { const val = document.getElementById("newHandi").value; if(val) updateHandicap(id, val, name); };
+  window.submitEvent = addEvent;
+  window.submitScore = addScore;
+  window.submitPost = addPost;
+  window.submitMember = addMember;
+
+  // 초기 렌더링
+  render();
+</script>
+
+<div id="app">
+  <div class="loading">
+    <div>
+      <div style="font-size:48px;margin-bottom:16px">⛳</div>
+      <div style="color:#7dba7d;font-family:sans-serif">불러오는 중...</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
