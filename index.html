@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="골통회" />
+  <meta name="theme-color" content="#0a0f0a" />
+  <title>⛳ 골통회</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0a0f0a;color:#e8f0e8;font-family:Georgia,serif}
+    #app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:80px}
+    .hdr{background:linear-gradient(135deg,#0d2b0d,#1a4a1a,#0d2b0d);padding:16px 20px;border-bottom:1px solid #2a4a2a;display:flex;justify-content:space-between;align-items:center}
+    .hdr h1{font-size:22px;color:#7dba7d;letter-spacing:2px}
+    .hdr p{font-size:11px;color:#4a7a4a;letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+    .hdr-profile{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .hdr-avatar{width:46px;height:46px;border-radius:50%;border:2px solid #7dba7d;display:flex;align-items:center;justify-content:center;font-size:24px;background:#0d2b0d}
+    .hdr-ptitle{font-size:10px;color:#7dba7d;font-family:sans-serif;text-align:center;line-height:1.4}
+    .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0d1a0d;border-top:1px solid #2a4a2a;display:flex;z-index:100}
+    .nav-item{flex:1;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-top:2px solid transparent;transition:all .2s}
+    .nav-item.active{background:rgba(125,186,125,.1);border-top-color:#7dba7d}
+    .nav-item span:first-child{font-size:16px}
+    .nav-item span:last-child{font-size:9px;color:#4a7a4a;font-family:sans-serif}
+    .nav-item.active span:last-child{color:#7dba7d}
+    .pg{padding:16px}
+    .card{background:#0f1f0f;border:1px solid #2a4a2a;border-radius:12px;padding:16px;margin-bottom:12px}
+    .sec{font-size:13px;color:#4a7a4a;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;font-family:sans-serif;font-weight:600}
+    .sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+    .sc{background:linear-gradient(135deg,#0d2b0d,#122212);border:1px solid #2a5a2a;border-radius:10px;padding:14px}
+    .btn{background:linear-gradient(135deg,#2a5a2a,#3a7a3a);color:#b8eab8;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-family:sans-serif}
+    .btn-red{background:linear-gradient(135deg,#5a2a2a,#7a3a3a);color:#f0b8b8;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-family:sans-serif}
+    .btn-out{background:transparent;color:#7dba7d;border:1px solid #3a6a3a;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:12px;font-family:sans-serif}
+    .btn-w{width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer}
+    input,select,textarea{width:100%;background:#0d1a0d;border:1px solid #2a4a2a;border-radius:8px;color:#e8f0e8;padding:8px 12px;font-size:13px;font-family:sans-serif;box-sizing:border-box;margin-bottom:8px}
+    textarea{resize:none}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+    .mbox{background:#0f1f0f;border:1px solid #2a5a2a;border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a3a1a}
+    .row:last-child{border-bottom:none}
+    .pb{height:6px;background:#1a3a1a;border-radius:3px;overflow:hidden}
+    .pf{height:100%;border-radius:3px;transition:width .4s}
+    .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-family:sans-serif}
+    .bg{background:#0a2a0a;color:#7dba7d;border:1px solid #2a5a2a}
+    .bo{background:#2a1a00;color:#ffaa44;border:1px solid #5a3a00}
+    .bb{background:#0a0a2a;color:#7dacff;border:1px solid #2a2a5a}
+    .br{background:#2a0a0a;color:#ff7070;border:1px solid #5a2a2a}
+    .bs{background:#0a1a2a;color:#7db8ff;border:1px solid #2a4a6a}
+    .bx{background:#1a1a1a;color:#888;border:1px solid #333}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .two input,.two select{margin:0}
+    .loading{display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}
+    .tab-bar{display:flex;border:1px solid #2a4a2a;border-radius:10px;overflow:hidden;margin-bottom:14px}
+    .tab-btn{flex:1;padding:10px;font-size:13px;font-family:sans-serif;cursor:pointer;border:none}
+    .info-box{background:#0d2b0d;border-radius:8px;padding:10px;margin-bottom:8px;font-family:sans-serif;font-size:12px;color:#7dba7d;line-height:1.6}
+  </style>
+</head>
+<body>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB4gLueyFufxHbGPHmvbYBZXhgUWoyQNWc",
+  authDomain: "golf-club-28ff5.firebaseapp.com",
+  projectId: "golf-club-28ff5",
+  storageBucket: "golf-club-28ff5.firebasestorage.app",
+  messagingSenderId: "754272270372",
+  appId: "1:754272270372:web:b7bb5ad2766e234b7a80b1",
+  measurementId: "G-J7F40FX00B"
+};
+
+const COURSES = [
+  {name:"Chicopee Woods School & Village", rating:68.3, slope:122},
+  {name:"Chicopee Woods Mill & School",    rating:68.3, slope:121},
+  {name:"Chicopee Woods Village & Mill",   rating:67.8, slope:123},
+  {name:"Royal Lakes",                     rating:71.0, slope:129},
+  {name:"Sugar Hill Golf Course",          rating:70.1, slope:136}
+];
+
+const CUP_POINTS = [15,12,10,9,8,7,6,5,5,4,3,2,1]; // 골통컵 순위별 포인트 (1위~13위)
+const CUP_YEAR = 2026;
+const CUP_START_MONTH = 2; // 2월부터 시작
+const CUP_END_MONTH = 8;   // 8월까지
+const ROLES = ["회원","총무","회장","명예회장","명예부회장","명예 총무","전회장"];
+const ANNUAL_FEE = 250;
+const BIRDIE_FEE = 5;
+
+const fbapp = initializeApp(firebaseConfig);
+const db = getFirestore(fbapp);
+
+let MY_NAME = localStorage.getItem("golfMyName") || "";
+
+let S = {
+  tab:"home", somSelected:[], somSize:4, somResult:null, tournamentTab:"list", modal:null, duesTab:"dues", duesYear:new Date().getFullYear(),
+  members:[], events:[], scores:[], posts:[], dues:[], birdies:[], rules:[], tournaments:[], cupResults:[], liked:[],
+  eNew:{}, sNew:{}, pNew:{category:"일반"}, mNew:{role:"회원"}, dNew:{}, bNew:{}, rNew:{category:"벌타",title:"",content:""}
+};
+
+onSnapshot(collection(db,"members"), s=>{S.members=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+var _lastEventCount = -1;
+var _lastPostCount = -1;
+onSnapshot(query(collection(db,"events"),orderBy("date","desc")), s=>{
+  var newEvents=s.docs.map(d=>({id:d.id,...d.data()}));
+  // 새 이벤트 알림
+  if(_lastEventCount>=0 && newEvents.length > _lastEventCount && MY_NAME) {
+    var newest=newEvents[0];
+    if(newest && newest.organizer !== MY_NAME) {
+      sendNotification("🎯 새 이벤트 등록!", newest.title+" - "+newest.date, "new_event");
+    }
+  }
+  _lastEventCount=newEvents.length;
+  S.events=newEvents;
+  S.events.forEach(function(ev){ if(!ev.waitlist) ev.waitlist=[]; });
+  checkDeadlines();
+  R();
+});
+onSnapshot(query(collection(db,"scores"),orderBy("date","desc")), s=>{S.scores=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+onSnapshot(query(collection(db,"posts"),orderBy("date","desc")), s=>{
+  var newPosts=s.docs.map(d=>({id:d.id,...d.data()}));
+  // 새 게시글 알림
+  if(_lastPostCount>=0 && newPosts.length > _lastPostCount && MY_NAME) {
+    var newestPost=newPosts[0];
+    if(newestPost && newestPost.author !== MY_NAME) {
+      sendNotification("📋 새 게시글", "["+newestPost.category+"] "+newestPost.title, "new_post");
+    }
+  }
+  _lastPostCount=newPosts.length;
+  S.posts=newPosts;
+  R();
+});
+onSnapshot(collection(db,"dues"), s=>{S.dues=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+onSnapshot(query(collection(db,"birdies"),orderBy("date","desc")), s=>{S.birdies=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+onSnapshot(collection(db,"rules"), s=>{S.rules=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+onSnapshot(query(collection(db,"tournaments"),orderBy("date","desc")), s=>{S.tournaments=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+onSnapshot(query(collection(db,"cup_results"),orderBy("month","asc")), s=>{S.cupResults=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+
+// 헬퍼
+const avgScore = name=>{const ms=S.scores.filter(s=>s.memberName===name);return ms.length?Math.round(ms.reduce((a,b)=>a+b.score,0)/ms.length):"-";};
+const isApp = ev=>(ev.applicants||[]).includes(MY_NAME);
+const isWait = ev=>(ev.waitlist||[]).includes(MY_NAME);
+const waitPos = ev=>(ev.waitlist||[]).indexOf(MY_NAME)+1;
+const bscore = ()=>{
+  var cm=new Date().getMonth()+1;
+  var cy=new Date().getFullYear();
+  var ms=S.scores.filter(s=>s.date&&s.date.startsWith(cy+"-"+String(cm).padStart(2,"0")));
+  return ms.length?Math.min(...ms.map(s=>s.score)):"-";
+};
+const bplayer = ()=>{
+  var b=bscore();
+  if(b==="-") return "-";
+  var cm=new Date().getMonth()+1;
+  var cy=new Date().getFullYear();
+  var ms=S.scores.filter(s=>s.date&&s.date.startsWith(cy+"-"+String(cm).padStart(2,"0")));
+  return (ms.find(s=>s.score===b)||{}).memberName||"-";
+};
+const pcColor = p=>p>=100?"#ff7070":p>=75?"#ffaa44":"#7dba7d";
+
+function calcUSGA(name){
+  const ms=S.scores.filter(s=>s.memberName===name&&s.courseRating&&s.slopeRating);
+  if(ms.length<3)return null;
+  const diffs=ms.map(s=>Math.round((s.score-parseFloat(s.courseRating))*113/parseFloat(s.slopeRating)*10)/10).sort((a,b)=>a-b);
+  const n=diffs.length;
+  const use=n>=20?8:n>=16?6:n>=12?5:n>=9?4:n>=7?3:n>=5?2:1;
+  return Math.round(diffs.slice(0,use).reduce((a,b)=>a+b,0)/use*0.96*10)/10;
+}
+
+// 액션
+async function doApply(ev){
+  const ref=doc(db,"events",ev.id),apps=ev.applicants||[],wait=ev.waitlist||[];
+  if(apps.includes(MY_NAME)){
+    const newApps=apps.filter(a=>a!==MY_NAME);
+    if(wait.length>0){await updateDoc(ref,{applicants:[...newApps,wait[0]],waitlist:wait.slice(1)});}
+    else{await updateDoc(ref,{applicants:newApps});}
+  } else if(wait.includes(MY_NAME)){
+    await updateDoc(ref,{waitlist:wait.filter(a=>a!==MY_NAME)});
+  } else if(apps.length<ev.maxParticipants){
+    await updateDoc(ref,{applicants:[...apps,MY_NAME]});
+  } else {
+    await updateDoc(ref,{waitlist:[...wait,MY_NAME]});
+  }
+}
+async function doUpdateEvent(id){
+  const title=document.getElementById("editEvTitle").value;
+  const date=document.getElementById("editEvDate").value;
+  const teeTime=document.getElementById("editEvTeeTime").value;
+  const maxParticipants=document.getElementById("editEvMax").value;
+  const fee=document.getElementById("editEvFee").value;
+  const deadline=document.getElementById("editEvDeadline").value;
+  const description=document.getElementById("editEvDesc").value;
+  const updates={};
+  const course=document.getElementById("editEvCourse").value;
+  if(title)updates.title=title;
+  if(course)updates.course=course;
+  if(date)updates.date=date;
+  if(teeTime)updates.teeTime=teeTime;
+  if(maxParticipants)updates.maxParticipants=parseInt(maxParticipants);
+  if(fee!=="")updates.fee=parseInt(fee)||0;
+  if(deadline)updates.deadline=deadline;
+  if(description!==undefined)updates.description=description;
+  await updateDoc(doc(db,"events",id),updates);
+  S.modal=null;R();
+}
+
+async function doDelEvent(id){if(confirm("이벤트를 삭제할까요?"))await deleteDoc(doc(db,"events",id));S.modal=null;R();}
+async function doAddEvent(){
+  const e=S.eNew;
+  var course=e.course==="직접입력"?(e.courseManual||""):e.course;
+  if(!e.title||!course||!e.date){alert("제목, 골프장, 날짜 필수!");return;}
+  var teeTimes=[e.teeTime1,e.teeTime2,e.teeTime3].filter(function(t){return t&&t.trim();});
+  await addDoc(collection(db,"events"),{
+    title:e.title,
+    course:course,
+    date:e.date,
+    deadline:e.deadline||"",
+    teeTime:teeTimes[0]||"",
+    teeTimes:teeTimes,
+    maxParticipants:parseInt(e.maxParticipants)||8,
+    fee:parseInt(e.fee)||0,
+    description:e.description||"",
+    organizer:MY_NAME,
+    applicants:[MY_NAME],
+    waitlist:[],
+    status:"모집중"
+  });
+  S.eNew={};S.modal=null;R();
+}
+async function doDelScore(id){
+  if(confirm("스코어를 삭제할까요?")) await deleteDoc(doc(db,"scores",id));
+}
+
+async function doUpdateScore(id){
+  const score=document.getElementById("editScore").value;
+  const course=document.getElementById("editCourse").value;
+  const date=document.getElementById("editScoreDate").value;
+  const courseRating=document.getElementById("editRating").value;
+  const slopeRating=document.getElementById("editSlope").value;
+  const updates={};
+  if(score) updates.score=parseInt(score);
+  if(course) updates.course=course;
+  if(date) updates.date=date;
+  if(courseRating) updates.courseRating=parseFloat(courseRating);
+  if(slopeRating) updates.slopeRating=parseFloat(slopeRating);
+  await updateDoc(doc(db,"scores",id),updates);
+  S.modal=null; R();
+}
+
+async function doAddScore(){
+  const s=S.sNew;if(!s.memberName||!s.score){alert("회원과 스코어 필수!");return;}
+  await addDoc(collection(db,"scores"),{...s,score:parseInt(s.score),courseRating:parseFloat(s.courseRating)||null,slopeRating:parseFloat(s.slopeRating)||113,date:s.date||new Date().toISOString().slice(0,10)});
+  setTimeout(()=>doAutoHandi(s.memberName),1000);
+  S.sNew={};S.modal=null;R();
+}
+async function doAutoHandi(name){
+  const h=calcUSGA(name);if(h===null)return;
+  const m=S.members.find(x=>x.name===name);if(!m||m.handicap===h)return;
+  const hist=[...(m.handicapHistory||[]),{handicap:m.handicap,date:new Date().toISOString().slice(0,10)}];
+  await updateDoc(doc(db,"members",m.id),{handicap:h,handicapHistory:hist});
+}
+async function doAddPost(){
+  const p=S.pNew;if(!p.title||!p.content){alert("제목과 내용 필수!");return;}
+  await addDoc(collection(db,"posts"),{...p,author:MY_NAME,date:new Date().toISOString().slice(0,10),likes:0});
+  S.pNew={category:"일반"};S.modal=null;R();
+}
+async function doAddMember(){
+  const m=S.mNew;if(!m.name){alert("이름 필수!");return;}
+  await addDoc(collection(db,"members"),{...m,handicap:parseFloat(parseFloat(m.handicap||36).toFixed(1)),joined:new Date().toISOString().slice(0,7)});
+  S.mNew={role:"회원"};S.modal=null;R();
+}
+async function doUpdateMember(id){
+  const role=document.getElementById("editRole").value;
+  const handicap=document.getElementById("editHandicap").value;
+  const updates={};
+  if(role)updates.role=role;
+  if(handicap)updates.handicap=parseFloat(parseFloat(handicap).toFixed(1));
+  if(Object.keys(updates).length>0)await updateDoc(doc(db,"members",id),updates);
+  S.modal=null;R();
+}
+async function doUpdateHandi(id,val){
+  const m=S.members.find(x=>x.id===id);if(!m)return;
+  const hist=[...(m.handicapHistory||[]),{handicap:m.handicap,date:new Date().toISOString().slice(0,10)}];
+  await updateDoc(doc(db,"members",id),{handicap:parseFloat(parseFloat(val).toFixed(1)),handicapHistory:hist});
+  S.modal=null;R();
+}
+async function doLike(post){
+  if(S.liked.includes(post.id)){S.liked=S.liked.filter(x=>x!==post.id);await updateDoc(doc(db,"posts",post.id),{likes:(post.likes||0)-1});}
+  else{S.liked.push(post.id);await updateDoc(doc(db,"posts",post.id),{likes:(post.likes||0)+1});}
+  R();
+}
+async function doAddDue(){
+  const d=S.dNew;if(!d.memberName||!d.year){alert("회원과 연도 필수!");return;}
+  if(S.dues.find(x=>x.memberName===d.memberName&&x.year==d.year)){alert("이미 납부 기록이 있습니다!");return;}
+  await addDoc(collection(db,"dues"),{memberName:d.memberName,year:parseInt(d.year),amount:ANNUAL_FEE,paidDate:d.paidDate||new Date().toISOString().slice(0,10),note:d.note||""});
+  S.dNew={};S.modal=null;R();
+}
+async function doDelDue(id){if(confirm("삭제할까요?"))await deleteDoc(doc(db,"dues",id));}
+async function doQuickPay(name){
+  if(S.dues.find(x=>x.memberName===name&&x.year===S.duesYear)){alert("이미 납부됐습니다!");return;}
+  await addDoc(collection(db,"dues"),{memberName:name,year:S.duesYear,amount:ANNUAL_FEE,paidDate:new Date().toISOString().slice(0,10),note:""});
+}
+async function doAddBirdie(){
+  const b=S.bNew;if(!b.memberName||!b.count){alert("회원과 버디 수 필수!");return;}
+  await addDoc(collection(db,"birdies"),{memberName:b.memberName,count:parseInt(b.count),amount:parseInt(b.count)*BIRDIE_FEE,date:b.date||new Date().toISOString().slice(0,10),course:b.course||"",paid:false});
+  S.bNew={};S.modal=null;R();
+}
+async function doToggleBirdie(id,cur){await updateDoc(doc(db,"birdies",id),{paid:!cur});}
+async function doDelBirdie(id){if(confirm("삭제할까요?"))await deleteDoc(doc(db,"birdies",id));}
+async function doAddRule(){
+  const r=S.rNew;if(!r.title||!r.content){alert("제목과 내용을 입력해주세요!");return;}
+  await addDoc(collection(db,"rules"),{title:r.title,content:r.content,category:r.category||"벌타"});
+  S.rNew={category:"벌타",title:"",content:""};S.modal=null;R();
+}
+async function doSaveTournament(data){
+  await addDoc(collection(db,"tournaments"), data);
+}
+async function doDelTournament(id){
+  if(confirm("대회 결과를 삭제할까요?")) await deleteDoc(doc(db,"tournaments",id));
+}
+
+async function doDelRule(id){if(confirm("삭제할까요?"))await deleteDoc(doc(db,"rules",id));}
+
+// 렌더링
+function R(){
+  const root=document.getElementById("app");
+  if(!root)return;
+
+  if(!MY_NAME){
+    root.innerHTML=`<div style="min-height:100vh;background:#0a0f0a;display:flex;align-items:center;justify-content:center;padding:20px"><div style="width:100%;max-width:360px"><div style="text-align:center;margin-bottom:32px"><div style="font-size:56px;margin-bottom:12px">⛳</div><div style="font-size:24px;color:#7dba7d;font-weight:bold;letter-spacing:2px">골통회</div><div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-top:4px;letter-spacing:3px">GOLF CLUB</div></div><div style="background:#0f1f0f;border:1px solid #2a5a2a;border-radius:16px;padding:24px"><div style="font-size:15px;color:#c8e8c8;margin-bottom:6px;font-family:sans-serif">안녕하세요! 👋</div><div style="font-size:13px;color:#4a7a4a;font-family:sans-serif;margin-bottom:20px;line-height:1.6">골통회 앱에 오신 걸 환영합니다.<br>본인 이름을 입력해 주세요.</div><input id="nameInput" placeholder="이름 입력 (예: 한용수)" style="width:100%;background:#0d1a0d;border:1px solid #2a4a2a;border-radius:8px;color:#e8f0e8;padding:12px;font-size:15px;font-family:sans-serif;box-sizing:border-box;margin-bottom:12px;text-align:center" /><button onclick="setMyName()" style="width:100%;background:linear-gradient(135deg,#2a5a2a,#3a7a3a);color:#b8eab8;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer">시작하기 ⛳</button></div></div></div>`;
+    // 푸시 알림 초기화
+async function initNotifications() {
+  if(!('Notification' in window)) return;
+  if(Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function sendNotification(title, body, tag) {
+  if(Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, {
+      body: body,
+      icon: 'https://emoji.archi/🏌️',
+      tag: tag || 'goltonghoe',
+      silent: false
+    });
+  } catch(e) {
+    console.log('알림 오류:', e);
+  }
+}
+
+// 마감 임박 체크 (D-2 이내)
+function checkDeadlines() {
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  S.events.filter(e=>e.status==="모집중"&&e.deadline).forEach(function(ev) {
+    var deadline = new Date(ev.deadline);
+    deadline.setHours(0,0,0,0);
+    var diff = Math.round((deadline-today)/(1000*60*60*24));
+    if(diff===2||diff===1||diff===0) {
+      var msg = diff===0?"오늘 마감!":diff===1?"내일 마감!":"2일 후 마감";
+      var key = "notified_deadline_"+ev.id+"_"+diff;
+      if(!localStorage.getItem(key)) {
+        sendNotification("⏰ 이벤트 마감 임박", ev.title+" - "+msg, "deadline_"+ev.id);
+        localStorage.setItem(key, "1");
+      }
+    }
+  });
+}
+
+window.setMyName=function(){const v=document.getElementById("nameInput").value.trim();if(!v){alert("이름을 입력해주세요!");return;}localStorage.setItem("golfMyName",v);MY_NAME=v;initNotifications();R();};
+    setTimeout(function(){const inp=document.getElementById("nameInput");if(inp)inp.addEventListener("keydown",function(e){if(e.key==="Enter")window.setMyName();});},100);
+    return;
+  }
+
+  const cu=S.members.find(m=>m.name===MY_NAME);
+  const upcoming=S.events.filter(e=>e.status==="모집중");
+  let html="";
+
+  // 헤더
+  html+='<div class="hdr"><div><h1>⛳ 골통회</h1><p>골프 동호회 · Since 2015</p></div>';
+  html+='<div class="hdr-profile"><div class="hdr-avatar">🏌️</div><div class="hdr-ptitle">초대 회장<br>한용수</div></div></div>';
+
+  // 콘텐츠
+  html+='<div class="pg">';
+  if(S.tab==="home")html+=pgHome(cu,upcoming);
+  else if(S.tab==="events")html+=pgEvents();
+  else if(S.tab==="members")html+=pgMembers();
+  else if(S.tab==="scores")html+=pgScores();
+  else if(S.tab==="dues")html+=pgDues();
+  else if(S.tab==="handicap")html+=pgHandicap();
+  else if(S.tab==="board")html+=pgBoard();
+  else if(S.tab==="rules")html+=pgRules();
+  else if(S.tab==="tournament")html+=pgTournament();
+  html+='</div>';
+
+  // 모달
+  if(S.modal)html+=renderModal();
+
+  // 네비 6개
+  html+='<nav class="nav">';
+  [["home","⛳","홈"],["events","🎯","이벤트"],["tournament","🏆","골통컵"],["scores","📊","스코어"],["dues","💰","회비"],["handicap","🏅","핸디"]].forEach(function(x){
+    html+='<div class="nav-item '+(S.tab===x[0]?"active":"")+'" onclick="setTab(\''+x[0]+'\')"><span>'+x[1]+'</span><span>'+x[2]+'</span></div>';
+  });
+  html+='</nav>';
+
+  root.innerHTML=html;
+}
+
+// ── 페이지들 ──
+
+function pgHome(cu,upcoming){
+  var bs=bscore(),bp=bplayer();
+  var h='<div style="background:linear-gradient(135deg,#0d2b0d,#1a3a1a);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;border:1px solid #2a5a2a">';
+  h+='<span style="font-size:32px">🏌️</span><div>';
+  h+='<div style="font-size:15px;color:#c8e8c8">안녕하세요, <strong style="color:#7dba7d">'+MY_NAME+'</strong>님 👋</div>';
+  if(cu)h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-top:2px">핸디캡 '+parseFloat(cu.handicap||0).toFixed(1)+' · '+cu.role+'</div>';
+  h+='</div></div>';
+
+  h+='<div class="sg">';
+  h+='<div class="sc" onclick="setTab(\'members\')" style="cursor:pointer">';
+  h+='<div style="font-size:32px;margin-bottom:4px">👥</div>';
+  h+='<div style="font-size:28px;font-weight:bold;color:#7dba7d">'+S.members.length+'</div>';
+  h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-top:4px">총 회원수 →</div></div>';
+  h+='<div class="sc" onclick="setTab(\'events\')" style="cursor:pointer">';
+  h+='<div style="font-size:32px;margin-bottom:4px">🎯</div>';
+  h+='<div style="font-size:28px;font-weight:bold;color:#7dba7d">'+upcoming.length+'</div>';
+  h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-top:4px">모집중 이벤트 →</div></div>';
+  h+='</div>';
+
+  // 버디 리더 랭킹
+  var cy=new Date().getFullYear();
+  var birdieRanking=S.members.map(function(m){
+    var recs=S.birdies.filter(b=>b.memberName===m.name&&b.date&&b.date.startsWith(cy));
+    var tot=recs.reduce((a,b)=>a+b.count,0);
+    return {...m,tot};
+  }).filter(m=>m.tot>0).sort((a,b)=>b.tot-a.tot).slice(0,3);
+
+  if(birdieRanking.length>0){
+    var bMedals=["🥇","🥈","🥉"];
+    var bColors=["#ffd700","#c0c0c0","#cd7f32"];
+    h+='<div class="card" style="border-left:3px solid #7dba7d;margin-bottom:12px">';
+    h+='<div class="sec">🐦 '+cy+'년 버디 리더</div>';
+    birdieRanking.forEach(function(m,i){
+      h+='<div class="row">';
+      h+='<div style="display:flex;align-items:center;gap:12px;flex:1">';
+      h+='<span style="font-size:20px">'+bMedals[i]+'</span>';
+      h+='<div><div style="font-size:14px;color:'+bColors[i]+';font-weight:bold">'+m.name+'</div>';
+      h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+m.role+'</div></div></div>';
+      h+='<div style="text-align:right">';
+      h+='<div style="font-size:22px;color:#7dba7d;font-weight:bold">'+m.tot+'</div>';
+      h+='<div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">버디</div>';
+      h+='</div></div>';
+    });
+    h+='</div>';
+  }
+
+  // 이달의 베스트
+  if(bp!=="-"){
+    h+='<div class="card"><div class="sec">🏆 이달의 베스트</div>';
+    h+='<div style="display:flex;align-items:center;gap:12px"><span style="font-size:36px">🥇</span>';
+    h+='<div><div style="font-size:18px;color:#ffd700;font-weight:bold">'+bp+'</div>';
+    h+='<div style="font-size:13px;color:#7dba7d">베스트 스코어 '+bs+'타</div></div></div></div>';
+  }
+
+  // 홀인원 명예의 전당
+  h+='<div class="card" style="border-left:3px solid #ffd700">';
+  h+='<div class="sec">🏆 홀인원 명예의 전당</div>';
+  var hios=[
+    {name:"엄 희영",course:"Chicopee Wood School",hole:"4번홀",yard:"145야드"},
+    {name:"김 철암",course:"Sugar Hill Golf Club",hole:"15번홀",yard:"155야드"},
+    {name:"문 기혁",course:"Bears Best",hole:"14번홀",yard:"165야드"}
+  ];
+  var medals=["🥇","🥈","🥉"];
+  hios.forEach(function(h2,i){
+    h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1a3a1a">';
+    h+='<span style="font-size:24px">'+medals[i]+'</span>';
+    h+='<div style="flex:1"><div style="font-size:15px;color:#ffd700;font-weight:bold">'+h2.name+'</div>';
+    h+='<div style="font-size:12px;color:#7dba7d;font-family:sans-serif">'+h2.course+'</div>';
+    h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+h2.hole+' · '+h2.yard+'</div></div>';
+    h+='<span style="font-size:22px">🎯</span></div>';
+  });
+  h+='</div>';
+
+  // 모집중 이벤트
+  h+='<div class="card"><div class="sec">🎯 모집중인 이벤트</div>';
+  if(upcoming.length===0)h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">모집중인 이벤트가 없습니다</div>';
+  upcoming.forEach(function(ev){
+    h+='<div class="row" onclick="showDetail(\''+ev.id+'\')" style="cursor:pointer">';
+    h+='<div><div style="font-size:14px;color:#c8e8c8;margin-bottom:3px">'+ev.title+'</div>';
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">'+ev.date+' · '+ev.course+'</div></div>';
+    h+=isApp(ev)?'<span class="badge bs">✓ 신청완료</span>':isWait(ev)?'<span class="badge" style="background:#2a2a00;color:#ffe066;border:1px solid #5a5a00">⏳ 대기</span>':'<span class="badge bg">'+(ev.applicants||[]).length+'/'+ev.maxParticipants+'명</span>';
+    h+='</div>';
+  });
+  h+='</div>';
+
+  // 로컬룰
+  h+='<div class="card" style="cursor:pointer;border-left:3px solid #7dacff" onclick="setTab(\'rules\')">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between">';
+  h+='<div><div style="font-size:15px;color:#c8e8c8;font-weight:bold;margin-bottom:4px">📋 로컬룰</div>';
+  h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">골통회 규정 및 벌칙 확인하기</div></div>';
+  h+='<span style="font-size:20px;color:#7dacff">→</span></div></div>';
+
+  h+='<div style="display:flex;justify-content:center;gap:16px;margin-top:8px">';
+  h+='<button onclick="changeName()" style="background:none;border:none;color:#4a7a4a;font-family:sans-serif;font-size:12px;cursor:pointer;text-decoration:underline">👤 이름 변경 (현재: '+MY_NAME+')</button>';
+  var notifGranted=(typeof Notification!=='undefined'&&Notification.permission==='granted');
+  h+='<button onclick="reqNotif()" style="background:none;border:none;font-family:sans-serif;font-size:12px;cursor:pointer;color:'+(notifGranted?'#7dba7d':'#ffaa44')+';text-decoration:underline">'+(notifGranted?'🔔 알림 켜짐':'🔕 알림 허용')+'</button>';
+  h+='</div>';
+  return h;
+}
+
+function evCard(ev){
+  var maxP=parseInt(ev.maxParticipants)||8;
+  ev.maxParticipants=maxP;
+  var applied=isApp(ev),waiting=isWait(ev),wpos=waitPos(ev);
+  var waitlist=ev.waitlist||[];
+  var wlen=waitlist.length;
+  var cnt=(ev.applicants||[]).length;
+  var full=(cnt>=maxP);
+  var pct=maxP>0?Math.round(cnt/maxP*100):0,color=pcColor(pct);
+  var h='<div class="card" style="border-left:3px solid '+(ev.status==="모집중"?"#7dba7d":"#333")+';cursor:pointer" onclick="showDetail(\''+ev.id+'\')">';
+  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">';
+  h+='<span class="badge '+(ev.status==="모집중"&&full?"br":ev.status==="모집중"?"bg":"bx")+'">'+(ev.status==="모집중"&&full?"모집마감":ev.status)+'</span>';
+  if(applied&&ev.status==="모집중")h+='<span class="badge bs">✓ 신청완료</span>';
+  if(waiting&&ev.status==="모집중")h+='<span class="badge" style="background:#2a2a00;color:#ffe066;border:1px solid #5a5a00">⏳ 대기 '+wpos+'번째</span>';
+  h+='</div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">';
+  h+='<div style="font-size:16px;color:#c8e8c8;font-weight:bold">'+ev.title+'</div>';
+  if(ev.organizer===MY_NAME){
+    h+='<div style="display:flex;gap:4px;flex-shrink:0">';
+    h+='<button onclick="event.stopPropagation();openEditEvent(\''+ev.id+'\')" style="background:none;border:1px solid #2a5a2a;color:#7dba7d;border-radius:6px;padding:2px 6px;cursor:pointer;font-size:11px;font-family:sans-serif">수정</button>';
+    h+='<button onclick="event.stopPropagation();doDelEvent(\''+ev.id+'\')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:16px;padding:0 0 0 4px">🗑</button>';
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div style="font-size:13px;color:#7dba7d;font-family:sans-serif">📍 '+ev.course+'</div>';
+  var teeDisplay="";
+  if(ev.teeTimes&&ev.teeTimes.length>0) teeDisplay=" · ⏰ "+ev.teeTimes.join(", ");
+  else if(ev.teeTime) teeDisplay=" · ⏰ "+ev.teeTime;
+  h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin:2px 0 10px">📅 '+ev.date+teeDisplay+(ev.fee>0?' · 🏌️ 그린피 $'+ev.fee:'')+'</div>';
+  h+='<div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">신청 현황</span><span style="font-size:12px;color:'+color+';font-weight:bold;font-family:sans-serif">'+cnt+' / '+ev.maxParticipants+'명</span></div>';
+  h+='<div class="pb"><div class="pf" style="width:'+Math.min(pct,100)+'%;background:'+color+'"></div></div>';
+
+  // 참가자 이름 표시
+  var appliedNames=ev.applicants||[];
+  var absentNames=S.members.filter(function(m){
+    return !appliedNames.includes(m.name)&&!(ev.waitlist||[]).includes(m.name);
+  }).map(function(m){return m.name;});
+
+  h+='<div style="margin-top:8px">';
+  if(cnt>0){
+    h+='<div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">✅ 참가 ('+cnt+'명)</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">';
+    appliedNames.forEach(function(name){
+      h+='<span style="font-size:11px;font-family:sans-serif;padding:2px 8px;border-radius:12px;background:'+(name===MY_NAME?'#1a3a1a':'#0d1a0d')+';border:1px solid '+(name===MY_NAME?'#3a7a3a':'#2a4a2a')+';color:'+(name===MY_NAME?'#7dba7d':'#888')+'">'+name+'</span>';
+    });
+    h+='</div>';
+  }
+  if(wlen>0){
+    h+='<div style="font-size:10px;color:#ffe066;font-family:sans-serif;margin-bottom:4px">⏳ 대기 ('+wlen+'명)</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">';
+    (ev.waitlist||[]).forEach(function(name){
+      h+='<span style="font-size:11px;font-family:sans-serif;padding:2px 8px;border-radius:12px;background:#1a1a00;border:1px solid #3a3a00;color:#ffe066">'+name+'</span>';
+    });
+    h+='</div>';
+  }
+  if(absentNames.length>0){
+    h+='<div style="font-size:10px;color:#ff7070;font-family:sans-serif;margin-bottom:4px">'+(ev.status==="모집중"?"❌ 미신청":"불참")+' ('+absentNames.length+'명)</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    absentNames.forEach(function(name){
+      h+='<span style="font-size:11px;font-family:sans-serif;padding:2px 8px;border-radius:12px;background:#1a0a0a;border:1px solid #3a2a2a;color:#ff7070;opacity:0.7">'+name+'</span>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+
+  if(ev.status==="모집중"){
+    h+='<div style="display:flex;gap:8px;margin-top:12px">';
+    if(applied){
+      h+='<button class="btn btn-w" style="flex:1" onclick="event.stopPropagation();doApplyEv(\''+ev.id+'\')">✅ 신청완료</button>';
+      h+='<button class="btn-red btn-w" style="flex:1" onclick="event.stopPropagation();doApplyEv(\''+ev.id+'\')">불참</button>';
+    } else if(waiting){
+      h+='<button class="btn-w" style="flex:1;background:linear-gradient(135deg,#5a4a00,#7a6a00);color:#ffe066;border:none;cursor:pointer" onclick="event.stopPropagation();doApplyEv(\''+ev.id+'\')">⏳ 대기 '+wpos+'번째</button>';
+      h+='<button class="btn-red btn-w" style="flex:1" onclick="event.stopPropagation();doApplyEv(\''+ev.id+'\')">취소</button>';
+    } else if(full){
+      h+='<button class="btn-w" style="flex:1;background:linear-gradient(135deg,#1a2a3a,#2a3a4a);color:#7db8ff;border:none;cursor:pointer" onclick="event.stopPropagation();doApplyEv(\''+ev.id+'\')">📋 대기 신청</button>';
+    } else {
+      h+='<button class="btn btn-w" style="flex:1" onclick="event.stopPropagation();doApplyEv(\''+ev.id+'\')">✅ 참가 신청</button>';
+    }
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function pgEvents(){
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h+='<div class="sec" style="margin:0">라운딩 이벤트</div>';
+  h+='<div style="display:flex;gap:6px">';
+  h+='<button style="background:linear-gradient(135deg,#1a2a3a,#2a3a4a);color:#7db8ff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-family:sans-serif" onclick="openModal(\'drawSom\')">🎲 썸 뽑기</button>';
+  h+='<button class="btn" onclick="openModal(\'addEvent\')">+ 이벤트 등록</button>';
+  h+='</div></div>';
+  ["모집중","종료"].forEach(function(g){
+    var filtered=S.events.filter(e=>g==="모집중"?e.status==="모집중":e.status!=="모집중");
+    if(g==="모집중") filtered.sort((a,b)=>a.date>b.date?1:-1);
+    else filtered.sort((a,b)=>a.date<b.date?1:-1);
+    if(!filtered.length)return;
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;letter-spacing:1px;margin-bottom:8px">'+(g==="모집중"?"🟢 모집중":"⬜ 종료된 이벤트")+'</div>';
+    filtered.forEach(function(ev){h+=evCard(ev);});
+  });
+  return h;
+}
+
+function pgMembers(){
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h+='<div class="sec" style="margin:0">회원 목록</div>';
+  h+='<button class="btn" onclick="openModal(\'addMember\')">+ 추가</button></div>';
+  var sortedMembers=[...S.members].sort((a,b)=>parseFloat(a.handicap||99)-parseFloat(b.handicap||99));
+  sortedMembers.forEach(function(m){
+    h+='<div class="card" style="border-left:'+(m.name===MY_NAME?"3px solid #7dba7d":"1px solid #2a4a2a")+'">';
+    h+='<div style="display:flex;align-items:center;gap:12px">';
+    h+='<div style="font-size:28px;width:44px;height:44px;background:#0d2b0d;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #2a5a2a;flex-shrink:0">⛳</div>';
+    h+='<div style="flex:1"><div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">';
+    h+='<span style="font-size:15px;color:#c8e8c8;font-weight:bold">'+m.name+'</span>';
+    h+='<span class="badge bb">'+m.role+'</span>';
+    if(m.name===MY_NAME)h+='<span style="font-size:10px;color:#7dba7d;font-family:sans-serif">나</span>';
+    h+='</div><div style="display:flex;gap:10px;font-family:sans-serif;align-items:center">';
+    h+='<span style="font-size:12px;color:#7dba7d">핸디 '+parseFloat(m.handicap||0).toFixed(1)+'</span>';
+    h+='<span style="font-size:12px;color:#4a7a4a">평균 '+avgScore(m.name)+'타</span>';
+    h+='<button onclick="openMemberEdit(\''+m.id+'\')" style="background:#0d2b0d;border:1px solid #2a5a2a;color:#7dba7d;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:11px;font-family:sans-serif;margin-left:auto">수정</button>';
+    h+='</div></div></div></div>';
+  });
+  return h;
+}
+
+function pgScores(){
+  var lb=S.members.map(m=>({...m,a:avgScore(m.name),cnt:S.scores.filter(s=>s.memberName===m.name).length})).filter(m=>m.cnt>0).sort((a,b)=>a.a-b.a);
+  var mc=["#ffd700","#c0c0c0","#cd7f32"],mb=["#3a2a00","#1a1a2a","#1a1a0a"];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h+='<div class="sec" style="margin:0">스코어 기록</div>';
+  h+='<div style="display:flex;gap:6px">';
+  h+='<button style="background:linear-gradient(135deg,#1a2a3a,#2a3a4a);color:#7db8ff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-family:sans-serif" onclick="openModal(\'scanScore\')">📸 카드 스캔</button>';
+  h+='<button class="btn" onclick="openModal(\'addScore\')">+ 기록</button>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="sec">🏆 리더보드</div>';
+  if(lb.length===0)h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">아직 기록이 없습니다</div>';
+  lb.forEach(function(m,i){
+    var color=i<3?mc[i]:"#4a7a4a",bg=i<3?mb[i]:"#0d1a0d";
+    h+='<div class="row"><div style="display:flex;align-items:center;gap:12px;flex:1">';
+    h+='<div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:'+bg+';border:1px solid '+color+';color:'+color+';font-family:sans-serif;font-weight:bold;flex-shrink:0">'+(i+1)+'</div>';
+    h+='<div style="cursor:pointer" onclick="showMemberScores(\''+m.name+'\')" ><div style="font-size:14px;color:#7db8ff;text-decoration:underline">'+m.name+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+m.cnt+'라운드</div></div></div>';
+    h+='<div style="text-align:right"><div style="font-size:20px;color:#7dba7d;font-weight:bold">'+m.a+'</div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">평균타</div></div></div>';
+  });
+  h+='</div>';
+  h+='<div class="card"><div class="sec">📝 최근 기록</div>';
+  if(S.scores.length===0)h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">아직 기록이 없습니다</div>';
+  S.scores.slice(0,20).forEach(function(s){
+    h+='<div class="row">';
+    h+='<div style="flex:1;cursor:pointer" onclick="showMemberScores(&quot;'+s.memberName+'&quot;)"><span style="font-size:14px;color:#7db8ff;text-decoration:underline">'+s.memberName+'</span>';
+    if(s.course)h+='<span style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-left:8px">'+s.course+'</span>';
+    h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+s.date+'</div></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px">';
+    h+='<span style="font-size:18px;color:#7dba7d;font-weight:bold">'+s.score+'</span>';
+    h+='<button onclick="openScoreEdit(&quot;'+s.id+'&quot;)" style="background:#0d2b0d;border:1px solid #2a5a2a;color:#7dba7d;border-radius:6px;padding:2px 6px;cursor:pointer;font-size:11px;font-family:sans-serif">수정</button>';
+    h+='<button onclick="doDelScore(&quot;'+s.id+'&quot;)" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:14px">🗑</button>';
+    h+='</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+function pgHandicap(){
+  var ranked=[...S.members].filter(m=>m.handicap).sort((a,b)=>a.handicap-b.handicap);
+  var mc=["#ffd700","#c0c0c0","#cd7f32"],mb=["#3a2a00","#1a1a2a","#1a1a0a"];
+  var h='<div class="info-box">🤖 <strong>USGA 자동계산</strong><br>스코어 입력 시 코스레이팅·슬로프레이팅을 입력하면 자동 계산됩니다. 최소 3라운드 필요.</div>';
+  h+='<div class="card"><div class="sec">🏅 핸디캡 랭킹</div>';
+  if(ranked.length===0)h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">등록된 핸디캡이 없습니다</div>';
+  ranked.forEach(function(m,i){
+    var color=i<3?mc[i]:"#4a7a4a",bg=i<3?mb[i]:"#0d1a0d";
+    var auto=calcUSGA(m.name);
+    h+='<div class="row"><div style="display:flex;align-items:center;gap:10px;flex:1">';
+    h+='<div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:'+bg+';border:1px solid '+color+';color:'+color+';font-family:sans-serif;font-weight:bold;flex-shrink:0">'+(i+1)+'</div>';
+    h+='<div><div style="font-size:14px;color:#c8e8c8">'+m.name+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+m.role+'</div></div></div>';
+    h+='<div style="display:flex;align-items:center;gap:10px">';
+    h+='<div style="text-align:right"><div style="font-size:22px;color:#7dba7d;font-weight:bold">'+parseFloat(m.handicap).toFixed(1)+'</div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">핸디캡</div></div>';
+    h+='<button onclick="openModal(\'editHandi_'+m.id+'\')" style="background:#0d2b0d;border:1px solid #2a5a2a;color:#7dba7d;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:sans-serif">수정</button>';
+    h+='</div></div>';
+    if(auto!==null&&auto!==m.handicap)h+='<div style="font-size:11px;color:#ffaa44;font-family:sans-serif;margin-top:4px;padding:4px 8px;background:#2a1a00;border-radius:6px">⚡ USGA 계산값: '+auto+'</div>';
+  });
+  h+='</div>';
+  var withHist=ranked.filter(m=>(m.handicapHistory||[]).length>0);
+  if(withHist.length>0){
+    h+='<div class="card"><div class="sec">📈 변동 히스토리</div>';
+    withHist.forEach(function(m){
+      h+='<div style="margin-bottom:14px"><div style="font-size:14px;color:#c8e8c8;margin-bottom:6px;font-weight:bold">'+m.name+' <span style="font-size:12px;color:#7dba7d">현재 '+parseFloat(m.handicap).toFixed(1)+'</span></div>';
+      [...(m.handicapHistory||[])].reverse().slice(0,5).forEach(function(h2){
+        h+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1a3a1a;font-family:sans-serif"><span style="font-size:12px;color:#4a7a4a">'+h2.date+'</span><span style="font-size:12px;color:#c8e8c8">'+h2.handicap+'</span></div>';
+      });
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  return h;
+}
+
+function pgDues(){
+  var cy=new Date().getFullYear(),sy=S.duesYear||cy;
+  var at=S.duesTab||"dues";
+  var paid=S.dues.filter(d=>d.year==sy);
+  var paidNames=paid.map(d=>d.memberName);
+  var unpaid=S.members.filter(m=>!paidNames.includes(m.name));
+  var tc=paid.length*ANNUAL_FEE,te=S.members.length*ANNUAL_FEE;
+  var pct=S.members.length?Math.round(paid.length/S.members.length*100):0,pcol=pcColor(pct);
+  var mb2=S.members.map(function(m){
+    var recs=S.birdies.filter(b=>b.memberName===m.name);
+    var tot=recs.reduce((a,b)=>a+b.count,0),amt=tot*BIRDIE_FEE;
+    var paidAmt=recs.filter(b=>b.paid).reduce((a,b)=>a+b.amount,0);
+    return {...m,tot,amt,paidAmt,unpaidAmt:amt-paidAmt,recs};
+  }).filter(m=>m.tot>0).sort((a,b)=>b.tot-a.tot);
+  var tbc=S.birdies.filter(b=>b.paid).reduce((a,b)=>a+b.amount,0);
+  var tbu=S.birdies.filter(b=>!b.paid).reduce((a,b)=>a+b.amount,0);
+  var tbt=S.birdies.reduce((a,b)=>a+b.count,0);
+
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+  h+='<div class="sec" style="margin:0">💰 회비 관리</div>';
+  h+='<button class="btn" onclick="openModal(\''+(at==="birdies"?"addBirdie":"addDue")+'\')">+ '+(at==="birdies"?"버디 등록":"납부 등록")+'</button></div>';
+  h+='<div class="tab-bar">';
+  h+='<button class="tab-btn" onclick="setDuesTab(\'dues\')" style="background:'+(at==="dues"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="dues"?"#b8eab8":"#4a7a4a")+'">🏦 연회비</button>';
+  h+='<button class="tab-btn" onclick="setDuesTab(\'birdies\')" style="background:'+(at==="birdies"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="birdies"?"#b8eab8":"#4a7a4a")+'">🐦 버디값</button>';
+  h+='</div>';
+
+  if(at==="dues"){
+    h+='<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><select onchange="setDuesYear(this.value)" style="width:auto;margin:0;padding:6px 10px;font-size:12px">';
+    [cy,cy-1,cy-2].forEach(function(y){h+='<option value="'+y+'"'+(sy==y?" selected":"")+'>'+y+'년</option>';});
+    h+='</select></div>';
+    h+='<div style="background:linear-gradient(135deg,#0d2b0d,#122212);border:1px solid #2a5a2a;border-radius:12px;padding:16px;margin-bottom:12px">';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">';
+    h+='<div style="text-align:center"><div style="font-size:22px;font-weight:bold;color:#7dba7d">'+paid.length+'/'+S.members.length+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">납부 완료</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:22px;font-weight:bold;color:#ffd700">$'+tc+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">수납 금액</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:22px;font-weight:bold;color:#ff7070">$'+(te-tc)+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">미납 금액</div></div>';
+    h+='</div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">납부율</span><span style="font-size:12px;color:'+pcol+';font-weight:bold;font-family:sans-serif">'+pct+'%</span></div>';
+    h+='<div class="pb"><div class="pf" style="width:'+pct+'%;background:'+pcol+'"></div></div></div>';
+    h+='<div class="card"><div class="sec" style="color:#7dba7d">✅ 납부 완료 ('+paid.length+'명)</div>';
+    if(paid.length===0)h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">납부자가 없습니다</div>';
+    paid.forEach(function(d){
+      h+='<div class="row"><div><div style="font-size:14px;color:#c8e8c8">'+d.memberName+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+d.paidDate+(d.note?' · '+d.note:'')+'</div></div>';
+      h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:15px;color:#7dba7d;font-weight:bold">$'+d.amount+'</span><button onclick="doDelDue(\''+d.id+'\')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:16px">🗑</button></div></div>';
+    });
+    h+='</div>';
+    if(unpaid.length>0){
+      h+='<div class="card" style="border-left:3px solid #ff7070"><div class="sec" style="color:#ff7070">❌ 미납 ('+unpaid.length+'명)</div>';
+      unpaid.forEach(function(m){
+        h+='<div class="row"><div style="font-size:14px;color:#c8e8c8">'+m.name+'</div>';
+        h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;color:#ff7070;font-family:sans-serif">$'+ANNUAL_FEE+' 미납</span><button onclick="doQuickPay(\''+m.name+'\')" style="background:#0d2b0d;border:1px solid #2a5a2a;color:#7dba7d;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-family:sans-serif">납부처리</button></div></div>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div class="card" style="border-left:3px solid #7dba7d;text-align:center;padding:20px"><div style="font-size:24px">🎉</div><div style="color:#7dba7d;font-family:sans-serif;margin-top:8px">전원 납부 완료!</div></div>';
+    }
+  } else {
+    h+='<div style="background:linear-gradient(135deg,#0d2b0d,#122212);border:1px solid #2a5a2a;border-radius:12px;padding:16px;margin-bottom:12px">';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">';
+    h+='<div style="text-align:center"><div style="font-size:22px;font-weight:bold;color:#7dba7d">'+tbt+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">총 버디 수</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:22px;font-weight:bold;color:#ffd700">$'+tbc+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">수납 완료</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:22px;font-weight:bold;color:#ff7070">$'+tbu+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">미납 금액</div></div>';
+    h+='</div></div>';
+    if(mb2.length===0){h+='<div class="card"><div style="font-size:13px;color:#4a7a4a;font-family:sans-serif;text-align:center;padding:10px">아직 버디 기록이 없습니다 🐦</div></div>';}
+    else{
+      mb2.forEach(function(m){
+        h+='<div class="card" style="border-left:3px solid '+(m.unpaidAmt>0?"#ffaa44":"#7dba7d")+'">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+        h+='<div><div style="font-size:15px;color:#c8e8c8;font-weight:bold">'+m.name+'</div><div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">총 🐦 '+m.tot+'개 · $'+m.amt+'</div></div>';
+        h+='<div style="text-align:right"><div style="font-size:13px;color:#7dba7d;font-family:sans-serif">납부 $'+m.paidAmt+'</div>'+(m.unpaidAmt>0?'<div style="font-size:13px;color:#ff7070;font-family:sans-serif">미납 $'+m.unpaidAmt+'</div>':'<div style="font-size:12px;color:#7dba7d;font-family:sans-serif">✅ 완납</div>')+'</div></div>';
+        m.recs.forEach(function(r){
+          h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #1a3a1a">';
+          h+='<div><span style="font-size:13px;color:#c8e8c8">🐦 '+r.count+'개</span>'+(r.course?'<span style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-left:6px">'+r.course+'</span>':'')+'<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+r.date+'</div></div>';
+          h+='<div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;color:#ffd700;font-weight:bold">$'+r.amount+'</span>';
+          h+='<button onclick="doToggleBirdie(\''+r.id+'\','+r.paid+')" style="font-size:11px;font-family:sans-serif;padding:3px 8px;border-radius:6px;cursor:pointer;border:1px solid '+(r.paid?"#2a5a2a":"#5a3a00")+';background:'+(r.paid?"#0a2a0a":"#2a1a00")+';color:'+(r.paid?"#7dba7d":"#ffaa44")+'">'+(r.paid?"✅ 납부":"⏳ 미납")+'</button>';
+          h+='<button onclick="doDelBirdie(\''+r.id+'\')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:14px">🗑</button></div></div>';
+        });
+        h+='</div>';
+      });
+    }
+  }
+  return h;
+}
+
+function pgBoard(){
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h+='<div class="sec" style="margin:0">게시판</div>';
+  h+='<button class="btn" onclick="openModal(\'addPost\')">+ 글쓰기</button></div>';
+  S.posts.forEach(function(p){
+    var bc=p.category==="공지"?"bo":p.category==="후기"?"bg":p.category==="팁"?"bb":"bx";
+    h+='<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="badge '+bc+'">'+p.category+'</span><span style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+p.date+'</span></div>';
+    h+='<div style="font-size:15px;color:#c8e8c8;font-weight:bold;margin-bottom:6px">'+p.title+'</div>';
+    h+='<div style="font-size:13px;color:#7a9a7a;line-height:1.6;margin-bottom:10px;font-family:sans-serif">'+p.content+'</div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">'+p.author+'</span>';
+    h+='<button onclick="doLikePost(\''+p.id+'\')" style="background:none;border:none;cursor:pointer;color:'+(S.liked.includes(p.id)?"#ff6666":"#4a7a4a")+';font-size:13px;font-family:sans-serif;display:flex;align-items:center;gap:4px">'+(S.liked.includes(p.id)?"❤️":"🤍")+' '+(p.likes||0)+'</button></div></div>';
+  });
+  return h;
+}
+
+function pgTournament(){
+  var at=S.tournamentTab||"list";
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+  h+='<div class="sec" style="margin:0">🏆 월간 대회</div>';
+  if(at==="list"||at==="cup") h+='<button class="btn" onclick="setTournamentTab(\'new\')">+ 대회 결과 등록</button>';
+  else h+='<button class="btn-out" onclick="setTournamentTab(\'list\')">← 목록으로</button>';
+  h+='</div>';
+  // 서브탭
+  h+='<div class="tab-bar" style="margin-bottom:14px">';
+  h+='<button class="tab-btn" onclick="setTournamentTab(\'list\')" style="background:'+(at==="list"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="list"?"#b8eab8":"#4a7a4a")+'">📋 대회 결과</button>';
+  h+='<button class="tab-btn" onclick="setTournamentTab(\'cup\')" style="background:'+(at==="cup"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="cup"?"#b8eab8":"#4a7a4a")+'">⭐ 골통컵</button>';
+  h+='</div>';
+
+  if(at==="cup"){
+    h+=renderCupStandings();
+  } else if(at==="list"){
+    if(S.tournaments.length===0){
+      h+='<div class="card"><div style="text-align:center;padding:20px;font-size:13px;color:#4a7a4a;font-family:sans-serif">아직 등록된 대회 결과가 없습니다<br><br>스코어카드를 스캔하거나 직접 입력해 주세요</div></div>';
+    }
+    S.tournaments.forEach(function(t){
+      h+='<div class="card" style="border-left:3px solid #ffd700">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+      h+='<div><div style="font-size:16px;color:#c8e8c8;font-weight:bold">'+t.title+'</div>';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">'+t.date+' · '+t.course+'</div></div>';
+      h+='<button onclick="doDelTournament(\''+t.id+'\' )" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:16px">🗑</button>';
+      h+='</div>';
+      // 순위표
+      var results=t.results||[];
+      results.forEach(function(r,i){
+        var medals=["🥇","🥈","🥉"];
+        var medal=i<3?medals[i]:'<span style="font-size:13px;color:#4a7a4a;font-family:sans-serif;font-weight:bold">'+(i+1)+'위</span>';
+        var netColor=r.net<0?"#7dba7d":r.net===0?"#c8e8c8":"#ff9090";
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #1a3a1a">';
+        h+='<span style="font-size:20px;width:28px;text-align:center">'+medal+'</span>';
+        h+='<div style="flex:1"><div style="font-size:14px;color:#c8e8c8;font-weight:'+(i===0?"bold":"normal")+'">'+r.name+'</div>';
+        h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">총 '+r.gross+'타 · 핸디 '+r.handicap+'</div></div>';
+        h+='<div style="text-align:right"><div style="font-size:20px;font-weight:bold;color:'+netColor+'">'+(r.net>0?"+":"")+r.net+'</div>';
+        h+='<div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">Net</div></div>';
+        h+='</div>';
+      });
+      h+='</div>';
+    });
+  } else {
+    // 새 대회 결과 등록
+    h+=renderTournamentForm();
+  }
+  return h;
+}
+
+function renderCupStandings(){
+  var year=CUP_YEAR;
+  var months=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  var monthNums=[1,2,3,4,5,6,7,8,9,10,11,12];
+
+  // 월별 결과 집계
+  var byMonth={};
+  S.cupResults.forEach(function(r){
+    byMonth[r.month]=r.results||[];
+  });
+
+  // 회원별 총 포인트 계산
+  var totals={};
+  S.members.forEach(function(m){ totals[m.name]=0; });
+  S.cupResults.forEach(function(r){
+    (r.results||[]).forEach(function(res){
+      if(totals[res.name]===undefined) totals[res.name]=0;
+      totals[res.name]+=(res.points||0);
+    });
+  });
+
+  // 순위 정렬
+  var ranked=Object.keys(totals).filter(function(n){return totals[n]>0;}).sort(function(a,b){return totals[b]-totals[a];});
+  var all=S.members.map(function(m){return m.name;});
+  var zero=all.filter(function(n){return !ranked.includes(n);});
+  var allRanked=[...ranked,...zero];
+
+  // 현재 달까지만 표시
+  var curMonth=Math.min(new Date().getMonth()+1, CUP_END_MONTH);
+  var displayMonths=monthNums.filter(function(m){return m>=CUP_START_MONTH&&m<=CUP_END_MONTH;});
+
+  var h='';
+  h+='<div style="background:linear-gradient(135deg,#1a1a00,#2a2a00);border:1px solid #5a5a00;border-radius:12px;padding:14px;margin-bottom:12px">';
+  h+='<div style="font-size:14px;color:#ffd700;font-weight:bold;margin-bottom:4px">⭐ '+year+'년 골통컵 포인트 랭킹</div>';
+  h+='<div style="font-size:11px;color:#888;font-family:sans-serif">순위별 포인트: 1위=15 · 2위=12 · 3위=10 · 4위=9 · 5위=8 · 6위=7...</div>';
+  h+='</div>';
+
+  // 랭킹 카드 (상위 3명)
+  if(ranked.length>0){
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">';
+    var topColors=["#ffd700","#c0c0c0","#cd7f32"];
+    var topBg=["#3a2a00","#1a1a2a","#1a1a0a"];
+    for(var ti=0;ti<Math.min(3,ranked.length);ti++){
+      var tn=ranked[ti];
+      h+='<div style="background:'+topBg[ti]+';border:1px solid '+topColors[ti]+';border-radius:10px;padding:10px;text-align:center">';
+      h+='<div style="font-size:18px;margin-bottom:4px">'+(ti===0?"🥇":ti===1?"🥈":"🥉")+'</div>';
+      h+='<div style="font-size:13px;color:'+topColors[ti]+';font-weight:bold;margin-bottom:2px">'+tn+'</div>';
+      h+='<div style="font-size:22px;font-weight:bold;color:'+topColors[ti]+'">'+totals[tn]+'</div>';
+      h+='<div style="font-size:10px;color:#4a7a4a;font-family:sans-serif">포인트</div>';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+
+  // 월별 포인트 테이블
+  h+='<div style="overflow-x:auto;margin-bottom:12px">';
+  h+='<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:12px">';
+  // 헤더
+  h+='<tr style="background:#0d1a0d">';
+  h+='<td style="padding:8px 10px;color:#4a7a4a;border-bottom:1px solid #2a4a2a;min-width:70px">이름</td>';
+  displayMonths.forEach(function(m){
+    h+='<td style="padding:8px 6px;color:#4a7a4a;text-align:center;border-bottom:1px solid #2a4a2a;min-width:36px">'+m+'월</td>';
+  });
+  h+='<td style="padding:8px 6px;color:#ffd700;text-align:center;border-bottom:1px solid #2a4a2a;font-weight:bold;min-width:40px">합계</td>';
+  h+='</tr>';
+  // 행
+  allRanked.forEach(function(name,idx){
+    var rank=ranked.indexOf(name);
+    var rowBg=idx%2===0?"#0d1a0d":"#0a1a0a";
+    h+='<tr style="background:'+rowBg+'">';
+    h+='<td style="padding:7px 10px;color:'+(rank===0?"#ffd700":rank===1?"#c0c0c0":rank===2?"#cd7f32":"#c8e8c8")+';border-bottom:1px solid #1a3a1a;font-weight:'+(rank<3?"bold":"normal")+'">';
+    h+=(rank>=0?'<span style="font-size:10px;margin-right:4px">'+(rank===0?"🥇":rank===1?"🥈":rank===2?"🥉":(rank+1)+"위")+'</span>':'')+name;
+    h+='</td>';
+    displayMonths.forEach(function(m){
+      var mResult=byMonth[year+"-"+String(m).padStart(2,"0")]||[];
+      var playerResult=mResult.find(function(r){return r.name===name;});
+      var pts=playerResult?playerResult.points:0;
+      h+='<td style="padding:7px 6px;text-align:center;border-bottom:1px solid #1a3a1a;color:'+(pts>0?"#7dba7d":"#333")+';font-weight:'+(pts>0?"bold":"normal")+'">'+(pts>0?pts:"-")+'</td>';
+    });
+    h+='<td style="padding:7px 6px;text-align:center;border-bottom:1px solid #1a3a1a;color:'+(totals[name]>0?"#ffd700":"#333")+';font-weight:bold">'+(totals[name]>0?totals[name]:"-")+'</td>';
+    h+='</tr>';
+  });
+  h+='</table></div>';
+
+  // 이번달 결과 업데이트 버튼
+  var curMonthKey=year+"-"+String(curMonth).padStart(2,"0");
+  var hasCurMonth=byMonth[curMonthKey]&&byMonth[curMonthKey].length>0;
+  h+='<button onclick="openModal(\'updateCup\')" style="width:100%;padding:10px;border-radius:8px;font-size:13px;font-family:sans-serif;cursor:pointer;background:'+(hasCurMonth?"#1a2a1a":"linear-gradient(135deg,#2a2a00,#3a3a00)")+';color:'+(hasCurMonth?"#4a7a4a":"#ffd700")+';border:1px solid '+(hasCurMonth?"#2a4a2a":"#5a5a00")+';">'+(hasCurMonth?"✅ "+curMonth+"월 결과 등록됨 (수정)":"⭐ "+curMonth+"월 대회 결과 입력")+'</button>';
+
+  return h;
+}
+
+function renderTournamentForm(){
+  var form=S.newTournament||{title:"",date:new Date().toISOString().slice(0,7),course:"",players:[]};
+  var h='<div class="card">';
+  h+='<div style="font-size:13px;color:#7dba7d;font-family:sans-serif;font-weight:bold;margin-bottom:12px">대회 기본 정보</div>';
+  h+='<input placeholder="대회명 (예: 2026년 3월 월간대회)" value="'+(form.title||'')+'" oninput="updTournament(\'title\',this.value)" />';
+  h+='<div class="two"><input type="month" value="'+(form.date||'')+'" oninput="updTournament(\'date\',this.value)" />';
+  h+='<select onchange="updTournament(\'course\',this.value)" style="margin:0">';
+  h+='<option value="">골프장 선택</option>';
+  COURSES.forEach(function(c){h+='<option value="'+c.name+'"'+(form.course===c.name?" selected":"")+'>'+c.name+'</option>';});
+  h+='<option value="직접입력">직접 입력</option>';
+  h+='</select></div>';
+  if(form.course==="직접입력") h+='<input placeholder="골프장 이름" oninput="updTournament(\'courseName\',this.value)" />';
+  h+='</div>';
+
+  h+='<div class="card">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+  h+='<div style="font-size:13px;color:#7dba7d;font-family:sans-serif;font-weight:bold">참가자 스코어 입력</div>';
+  h+='<button onclick="addTournamentPlayer()" class="btn-out">+ 추가</button>';
+  h+='</div>';
+
+  var players=form.players||[];
+  if(players.length===0){
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;text-align:center;padding:10px">참가자를 추가해 주세요</div>';
+  }
+  players.forEach(function(p,i){
+    var net=p.gross&&p.handicap!==undefined?parseInt(p.gross)-parseInt(p.handicap):"-";
+    h+='<div style="background:#0d1a0d;border:1px solid #2a4a2a;border-radius:8px;padding:10px;margin-bottom:8px">';
+    h+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">';
+    h+='<select onchange="updPlayer('+i+',\'name\',this.value)" style="flex:2;margin:0;font-size:13px">';
+    h+='<option value="">회원 선택</option>';
+    S.members.forEach(function(m){h+='<option value="'+m.name+'"'+(p.name===m.name?" selected":"")+'>'+m.name+'</option>';});
+    h+='</select>';
+    h+='<button onclick="removeTournamentPlayer('+i+')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:16px;flex-shrink:0">🗑</button>';
+    h+='</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
+    h+='<div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-bottom:3px">총 스코어</div>';
+    h+='<input type="number" placeholder="예:85" value="'+(p.gross||'')+'" onchange="updPlayer('+i+',\'gross\',this.value)" style="margin:0;font-size:15px;text-align:center;font-weight:bold;color:#c8e8c8" /></div>';
+    h+='<div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-bottom:3px">핸디캡</div>';
+    h+='<input type="number" step="0.1" placeholder="예:12" value="'+(p.handicap!==undefined?p.handicap:'')+'" onchange="updPlayer('+i+',\'handicap\',this.value)" style="margin:0;font-size:15px;text-align:center;font-weight:bold;color:#7dba7d" /></div>';
+    h+='<div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-bottom:3px">Net 스코어</div>';
+    h+='<div style="background:#0a2a0a;border:1px solid #2a5a2a;border-radius:8px;padding:8px;text-align:center;font-size:18px;font-weight:bold;color:'+(net<0?"#7dba7d":net===0?"#c8e8c8":"#ff9090")+'">'+(typeof net==="number"?(net>0?"+":"")+net:"-")+'</div></div>';
+    h+='</div></div>';
+  });
+  h+='</div>';
+
+  if(players.length>0&&players.some(function(p){return p.name&&p.gross;})){
+    // 순위 미리보기
+    var sorted=[...players].filter(function(p){return p.name&&p.gross;}).map(function(p){
+      return {...p,net:parseInt(p.gross)-(parseFloat(p.handicap)||0)};
+    }).sort(function(a,b){return a.net-b.net;});
+
+    h+='<div class="card" style="border:1px solid #2a5a2a">';
+    h+='<div style="font-size:13px;color:#7dba7d;font-family:sans-serif;font-weight:bold;margin-bottom:12px">🏆 순위 미리보기</div>';
+    var medals=["🥇","🥈","🥉"];
+    sorted.forEach(function(p,i){
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #1a3a1a">';
+      h+='<span style="font-size:18px;width:24px;text-align:center">'+(i<3?medals[i]:(i+1)+'위')+'</span>';
+      h+='<div style="flex:1"><div style="font-size:14px;color:#c8e8c8">'+p.name+'</div></div>';
+      h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">'+p.gross+'타 - '+parseFloat(p.handicap||0).toFixed(1)+'</div>';
+      h+='<div style="font-size:18px;font-weight:bold;color:'+(p.net<0?"#7dba7d":p.net===0?"#c8e8c8":"#ff9090")+';min-width:40px;text-align:right">'+(p.net>0?"+":"")+p.net+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+
+    h+='<button onclick="saveTournamentResult()" style="width:100%;padding:13px;border-radius:10px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer;background:linear-gradient(135deg,#2a5a2a,#3a7a3a);color:#b8eab8;border:none;margin-top:4px">🏆 대회 결과 저장 & 공지</button>';
+  }
+  return h;
+}
+
+function pgRules(){
+  var cats=["벌타","OB/워터해저드","버디/이글","회비/벌금","기타"];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+  h+='<div class="sec" style="margin:0">📋 로컬룰</div>';
+  h+='<button class="btn" onclick="openModal(\'addRule\')">+ 규정 추가</button></div>';
+
+  var defaultRules=[
+    {category:"벌타",title:"OB / 로스트볼",content:"벌타: 2벌타\n공이 있을 것으로 예상되는 지점에서 가장 가까운 곳으로 벗어나 플레이하기 좋은 위치에서 진행.\n페어웨이 중앙으로 간 공이라도 확인되지 않으면 로스트볼 처리."},
+    {category:"벌타",title:"언플레이어블 볼",content:"벌타: 1벌타\n볼 진입 지점(말뚝·도로 기준) 2클럽 이내 드롭.\n핵심: 홀에 가까워지지 않게!"},
+    {category:"OB/워터해저드",title:"노란 말뚝 (Yellow Stake)",content:"벌타: 1벌타\n처음 진입 지점 기준 2클럽 이내 드롭.\n홀에 가까워지지 않게 적용."},
+    {category:"OB/워터해저드",title:"빨간 말뚝 (Red Stake)",content:"벌타: 1벌타\n마지막 진입 지점 기준 2클럽 이내 드롭.\n홀에 가까워지지 않게 적용."},
+    {category:"기타",title:"볼 터치 규정",content:"터치 가능: 페어웨이, 그린, 프린지\n터치 불가: 러프 포함 페어웨이·그린·프린지 외 모든 지역\n나무뿌리, 돌 지역 포함 → 노터치\n벙커: 발자국 등 코스 컨디션 정리에 한해 터치 가능"},
+    {category:"기타",title:"로스트볼 탐색 & 경기 진행",content:"볼 탐색 중 나머지 3명의 플레이어가 모두 샷을 마칠 때까지 공을 찾지 못하면 로스트볼로 벌타 적용 후 진행.\n장시간 볼 탐색 금지 (원활한 경기 진행 우선)."},
+    {category:"기타",title:"프로비저널 규정",content:"프로비저널 선언 없이 공이 죽었다고 판단해 다시 플레이한 경우, 이후 기존 볼을 발견하더라도 구제 불가.\n→ 다시 플레이한 볼이 인플레이."},
+    {category:"기타",title:"플레이 매너",content:"퍼팅 OK 남발 금지. 실제 퍼팅을 원칙으로 플레이."},
+    {category:"기타",title:"핵심 요약",content:"✅ 2벌타 = 좋은 위치에서 진행\n✅ 1벌타 = 진입 지점 기준 2클럽 이내 드롭 (홀에 가까워지지 않게)\n✅ 모든 규칙은 원활한 경기 진행과 공정한 플레이를 위한 로컬룰"}
+  ];
+
+  var displayRules=S.rules.length>0?S.rules:defaultRules;
+  var hasFB=S.rules.length>0;
+  var catColors={"벌타":"#ff7070","OB/워터해저드":"#7dacff","버디/이글":"#7dba7d","회비/벌금":"#ffd700","기타":"#888"};
+  var catIcons={"벌타":"⚠️","OB/워터해저드":"💧","버디/이글":"🐦","회비/벌금":"💰","기타":"📌"};
+
+  if(!hasFB)h+='<div class="info-box">💡 샘플 규정입니다. "+ 규정 추가"로 실제 규정을 등록하세요!</div>';
+
+  cats.forEach(function(cat){
+    var catRules=displayRules.filter(r=>r.category===cat);
+    if(!catRules.length)return;
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;letter-spacing:1px;margin-bottom:8px;margin-top:4px">'+(catIcons[cat]||"📌")+' '+cat+'</div>';
+    catRules.forEach(function(r){
+      h+='<div class="card" style="border-left:3px solid '+(catColors[cat]||"#888")+'">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
+      h+='<div style="font-size:15px;color:#c8e8c8;font-weight:bold">'+r.title+'</div>';
+      if(hasFB)h+='<button onclick="doDelRule(\''+r.id+'\')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:14px;flex-shrink:0">🗑</button>';
+      h+='</div><div style="font-size:13px;color:#7a9a7a;line-height:1.7;font-family:sans-serif;white-space:pre-line">'+r.content+'</div></div>';
+    });
+  });
+  return h;
+}
+
+// ── 모달 ──
+function renderModal(){
+  var m=S.modal;
+  var h="";
+
+  if(m==="scanScore"||m==="scanScore_loading"||m==="scanScore_result"){
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+    h+='<div style="font-size:16px;color:#7dba7d;font-weight:bold">📸 스코어카드 스캔</div>';
+    h+='<button onclick="closeModal()" style="background:none;border:none;color:#4a7a4a;font-size:22px;cursor:pointer">×</button></div>';
+
+    if(m==="scanScore"){
+      h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif;margin-bottom:14px;line-height:1.6">스코어카드 사진을 업로드하면 AI가 자동으로 분석해서 스코어를 입력해 드려요!</div>';
+      h+='<label style="display:block;border:2px dashed #2a5a2a;border-radius:12px;padding:30px;text-align:center;cursor:pointer;margin-bottom:14px">';
+      h+='<div style="font-size:36px;margin-bottom:8px">📸</div>';
+      h+='<div style="font-size:14px;color:#7dba7d;font-family:sans-serif;margin-bottom:4px">사진을 탭해서 업로드</div>';
+      h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">JPG, PNG 지원</div>';
+      h+='<input type="file" accept="image/*" capture="environment" onchange="scanScoreCard(this)" style="display:none">';
+      h+='</label>';
+      h+='<div class="info-box">💡 스코어카드 전체가 잘 보이도록 촬영해 주세요</div>';
+    }
+    else if(m==="scanScore_loading"){
+      h+='<div style="text-align:center;padding:40px 20px">';
+      h+='<div style="font-size:48px;margin-bottom:16px">🤖</div>';
+      h+='<div style="font-size:15px;color:#7dba7d;font-family:sans-serif;margin-bottom:8px">AI가 스코어카드를 분석 중...</div>';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">잠시만 기다려 주세요</div>';
+      h+='</div>';
+    }
+    else if(m==="scanScore_result"){
+      var res=S.scanResult||[];
+      h+='<div style="font-size:13px;color:#c8e8c8;font-family:sans-serif;margin-bottom:14px">분석 결과를 확인하고 저장해 주세요!</div>';
+      if(res.length===0){
+        h+='<div style="text-align:center;padding:20px;font-size:13px;color:#ff7070;font-family:sans-serif">스코어를 인식하지 못했어요. 다시 시도해 주세요.</div>';
+      } else {
+        for(var ri=0;ri<res.length;ri++){
+          var r=res[ri];
+          h+='<div style="background:#0d1a0d;border:1px solid #2a4a2a;border-radius:10px;padding:12px;margin-bottom:8px">';
+          h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+          h+='<select onchange="updateScanMember('+ri+',this.value)" style="flex:1;margin:0;margin-right:8px;font-size:13px">';
+          h+='<option value="">회원 선택</option>';
+          for(var mi=0;mi<S.members.length;mi++){
+            var mem2=S.members[mi];
+            h+='<option value="'+mem2.name+'"'+(r.memberName===mem2.name?' selected':'')+'>'+mem2.name+'</option>';
+          }
+          h+='</select>';
+          // ESC 미리보기 계산
+          var previewScore=r.score;
+          var escPreview='';
+          if(r.holes&&r.holes.length>=18&&r.slopeRating){
+            var mem3=S.members.find(function(m){return m.name===r.memberName;});
+            if(mem3&&mem3.handicap){
+              var ch=calcCourseHandicap(mem3.handicap,r.slopeRating);
+              var es=applyESC(r.holes,ch);
+              if(es!==null&&es!==parseInt(r.score)){
+                previewScore=es;
+                escPreview='<div style="font-size:10px;color:#ffaa44;font-family:sans-serif;margin-top:2px">ESC 조정: '+r.score+'→'+es+'타 (코스핸디 '+ch+')</div>';
+              }
+            }
+          }
+          h+='<div style="text-align:right">';
+          h+='<input type="number" value="'+previewScore+'" onchange="updateScanScore('+ri+',this.value)" style="width:70px;margin:0;font-size:16px;font-weight:bold;color:#7dba7d;text-align:center">';
+          h+=escPreview;
+          h+='</div>';
+          h+='</div>';
+          h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+(r.course||'골프장 미상')+' · '+(r.date||'')+'</div>';
+          h+='</div>';
+        }
+        h+='<button onclick="saveScanResults()" style="width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer;background:linear-gradient(135deg,#2a5a2a,#3a7a3a);color:#b8eab8;border:none;margin-top:4px">✅ 스코어 저장</button>';
+      }
+      h+='<button onclick="openModal(\'scanScore\')" style="width:100%;padding:9px;border-radius:8px;font-size:13px;font-family:sans-serif;cursor:pointer;background:#0d1a0d;color:#4a7a4a;border:1px solid #2a4a2a;margin-top:8px">📸 다시 스캔</button>';
+    }
+    h+='</div></div>';
+  }
+  else if(m==="updateCup"){
+    var curMonth=Math.min(new Date().getMonth()+1, CUP_END_MONTH);
+    var curMonthKey=CUP_YEAR+"-"+String(curMonth).padStart(2,"0");
+    var existing=S.cupResults.find(function(r){return r.month===curMonthKey;});
+    var cupPlayers=S.newCupPlayers||(existing?existing.results.map(function(r){return {name:r.name,rank:r.rank,points:r.points};}):
+      S.members.slice(0,8).map(function(m,i){return {name:m.name,rank:i+1,points:CUP_POINTS[i]||0};}));
+    if(!S.newCupPlayers) S.newCupPlayers=cupPlayers;
+
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+    h+='<div style="font-size:16px;color:#ffd700;font-weight:bold">⭐ '+curMonth+'월 골통컵 결과</div>';
+    h+='<button onclick="closeModal()" style="background:none;border:none;color:#4a7a4a;font-size:22px;cursor:pointer">×</button></div>';
+    h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:12px">순위 선택 시 포인트 자동 입력 · 1위=15 2위=12 3위=10...</div>';
+    h+='<div style="max-height:400px;overflow-y:auto">';
+    for(var ci=0;ci<cupPlayers.length;ci++){
+      var cp=cupPlayers[ci];
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #1a3a1a">';
+      h+='<select onchange="updCupRank('+ci+',this.value)" style="width:60px;margin:0;font-size:13px;text-align:center">';
+      h+='<option value="">-</option>';
+      for(var ri=1;ri<=13;ri++){
+        h+='<option value="'+ri+'"'+(cp.rank==ri?" selected":"")+'>'+ri+'위</option>';
+      }
+      h+='</select>';
+      h+='<select onchange="updCupName('+ci+',this.value)" style="flex:1;margin:0;font-size:13px">';
+      h+='<option value="">회원 선택</option>';
+      S.members.forEach(function(m){h+='<option value="'+m.name+'"'+(cp.name===m.name?" selected":"")+'>'+m.name+'</option>';});
+      h+='</select>';
+      h+='<div style="width:40px;text-align:center;font-size:16px;font-weight:bold;color:#ffd700">'+(cp.points||0)+'</div>';
+      h+='<button onclick="removeCupPlayer('+ci+')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:14px">🗑</button>';
+      h+='</div>';
+    }
+    h+='</div>';
+    h+='<button onclick="addCupPlayer()" class="btn-out" style="width:100%;margin-top:8px">+ 참가자 추가</button>';
+    h+='<button onclick="saveCupResult()" style="width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer;background:linear-gradient(135deg,#2a2a00,#3a3a00);color:#ffd700;border:1px solid #5a5a00;margin-top:8px">⭐ 저장</button>';
+    h+='</div></div>';
+  }
+  else if(m==="drawSom"){
+    var somResult=S.somResult||null;
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+    h+='<div style="font-size:16px;color:#7dba7d;font-weight:bold">🎲 썸 뽑기</div>';
+    h+='<button onclick="closeModal()" style="background:none;border:none;color:#4a7a4a;font-size:22px;cursor:pointer">×</button></div>';
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:8px">참가 회원 선택</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+    S.members.forEach(function(m2){
+      var selected=(S.somSelected||[]).includes(m2.name);
+      h+='<button onclick="toggleSomMember(&quot;'+m2.name+'&quot;)" style="padding:5px 12px;border-radius:20px;font-size:12px;font-family:sans-serif;cursor:pointer;border:1px solid '+(selected?'#7dba7d':'#2a4a2a')+';background:'+(selected?'#1a3a1a':'#0d1a0d')+';color:'+(selected?'#7dba7d':'#4a7a4a')+'">'+m2.name+'</button>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">조 인원:</div>';
+    [2,3,4,5].forEach(function(n){
+      var sel=(S.somSize||4)===n;
+      h+='<button onclick="setSomSize('+n+')" style="width:36px;height:36px;border-radius:50%;font-size:13px;font-family:sans-serif;cursor:pointer;border:1px solid '+(sel?'#7dba7d':'#2a4a2a')+';background:'+(sel?'#1a3a1a':'#0d1a0d')+';color:'+(sel?'#7dba7d':'#4a7a4a')+'">'+n+'</button>';
+    });
+    h+='</div>';
+    h+='<button onclick="doDrawSom()" style="width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer;background:linear-gradient(135deg,#1a2a3a,#2a3a4a);color:#7db8ff;border:none;margin-bottom:14px">🎲 랜덤 썸 뽑기!</button>';
+    if(somResult&&somResult.length>0){
+      h+='<div style="border-top:1px solid #1a3a1a;padding-top:14px">';
+      h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif;margin-bottom:10px;text-align:center;letter-spacing:2px">— 결 과 —</div>';
+      var gcolors=['#7dba7d','#7db8ff','#ffd700','#ffaa44','#ff9090'];
+      somResult.forEach(function(group,gi){
+        var gc=gcolors[gi%gcolors.length];
+        h+='<div style="background:#0d1a0d;border:1px solid #2a4a2a;border-left:3px solid '+gc+';border-radius:10px;padding:12px;margin-bottom:8px">';
+        h+='<div style="font-size:11px;color:'+gc+';font-family:sans-serif;font-weight:bold;margin-bottom:8px">'+(gi+1)+'조 ('+group.length+'명)</div>';
+        h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+        group.forEach(function(name){
+          h+='<div style="background:#0a2a0a;border:1px solid #2a5a2a;border-radius:20px;padding:5px 12px;font-size:13px;color:#c8e8c8;font-family:sans-serif">'+name+'</div>';
+        });
+        h+='</div></div>';
+      });
+      h+='<button onclick="doDrawSom()" style="width:100%;padding:9px;border-radius:8px;font-size:13px;font-family:sans-serif;cursor:pointer;background:#0d1a0d;color:#4a7a4a;border:1px solid #2a4a2a;margin-top:4px">🔄 다시 뽑기</button>';
+      h+='</div>';
+    }
+    h+='</div></div>';
+  }
+  else if(m && m.startsWith("editEvent_")){
+    var eid=m.replace("editEvent_",""),eev=S.events.find(x=>x.id===eid);
+    if(eev){
+      h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+      h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">✏️ 이벤트 수정</div>';
+      h+='<input id="editEvTitle" placeholder="이벤트 제목" value="'+eev.title+'" />';
+      h+='<input id="editEvCourse" placeholder="골프장" value="'+(eev.course||'')+'" style="background:#0d1a0d;border:1px solid #2a4a2a;border-radius:8px;color:#e8f0e8;padding:8px 12px;font-size:13px;font-family:sans-serif;width:100%;box-sizing:border-box;margin-bottom:8px" />';
+      h+='<div class="two"><input id="editEvDate" type="date" value="'+(eev.date||'')+'" /><input id="editEvTeeTime" type="time" value="'+(eev.teeTime||'')+'" /></div>';
+      h+='<div class="two"><div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">최대 인원</div><input id="editEvMax" type="number" value="'+(eev.maxParticipants||'')+'" style="margin:0" /></div><div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">그린피 ($)</div><input id="editEvFee" type="number" value="'+(eev.fee||'')+'" style="margin:0" /></div></div><div style="height:8px"></div>';
+      h+='<input id="editEvDeadline" type="date" value="'+(eev.deadline||'')+'" />';
+      h+='<textarea id="editEvDesc" rows="3" placeholder="이벤트 설명">'+(eev.description||'')+'</textarea>';
+      h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doUpdateEvent(&quot;'+eid+'&quot;)">저장</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+      h+='</div></div>';
+    }
+  }
+  else if(m==="addEvent"){
+    var en=S.eNew||{};
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">🎯 이벤트 등록</div>';
+    h+='<input placeholder="이벤트 제목" oninput="upd(\'eNew\',\'title\',this.value)" />';
+    // 골프장 프리셋 선택
+    h+='<select id="evCourseSelect" onchange="selectEvCourse(this.value)" style="margin-bottom:8px">';
+    h+='<option value="">골프장 선택</option>';
+    COURSES.forEach(function(c){h+='<option value="'+c.name+'"'+(en.course===c.name?" selected":"")+'>'+c.name+'</option>';});
+    h+='<option value="직접입력">✏️ 직접 입력</option>';
+    h+='</select>';
+    h+='<div id="evCourseManual" style="display:'+(en.course&&!COURSES.find(function(c){return c.name===en.course;})&&en.course!=="직접입력"?'block':'none')+'">';
+    h+='<input id="evCourseName" placeholder="골프장 이름 직접 입력" value="'+(en.courseManual||'')+'" oninput="upd(\'eNew\',\'courseManual\',this.value)" />';
+    h+='</div>';
+    // 날짜 + 신청마감
+    h+='<div class="two"><input type="date" value="'+(en.date||'')+'" oninput="upd(\'eNew\',\'date\',this.value)" /><input type="date" value="'+(en.deadline||'')+'" oninput="upd(\'eNew\',\'deadline\',this.value)" placeholder="신청 마감일" /></div>';
+    // 티타임 3개
+    h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:6px">⏰ 티타임 (최대 3개)</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">';
+    h+='<input type="time" value="'+(en.teeTime1||'')+'" oninput="upd(\'eNew\',\'teeTime1\',this.value)" placeholder="1조" />';
+    h+='<input type="time" value="'+(en.teeTime2||'')+'" oninput="upd(\'eNew\',\'teeTime2\',this.value)" placeholder="2조" />';
+    h+='<input type="time" value="'+(en.teeTime3||'')+'" oninput="upd(\'eNew\',\'teeTime3\',this.value)" placeholder="3조" />';
+    h+='</div>';
+    // 최대 인원 + 그린피
+    h+='<div class="two">';
+    h+='<div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">최대 인원</div>';
+    h+='<input type="number" placeholder="예: 12" value="'+(en.maxParticipants||'')+'" oninput="upd(\'eNew\',\'maxParticipants\',this.value)" style="margin:0" /></div>';
+    h+='<div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">그린피 ($)</div>';
+    h+='<input type="number" placeholder="예: 65" value="'+(en.fee||'')+'" oninput="upd(\'eNew\',\'fee\',this.value)" style="margin:0" /></div>';
+    h+='</div><div style="height:8px"></div>';
+    h+='<textarea rows="3" placeholder="이벤트 설명 (선택)" oninput="upd(\'eNew\',\'description\',this.value)">'+(en.description||'')+'</textarea>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddEvent()">등록하기</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  else if(m && m.startsWith("detail_")){
+    var ev=S.events.find(e=>e.id===m.replace("detail_",""));
+    if(ev){
+      var maxP2=parseInt(ev.maxParticipants)||8;
+      var applied=isApp(ev),waiting=isWait(ev),wpos2=waitPos(ev);
+      var cnt=(ev.applicants||[]).length,full=(cnt>=maxP2);
+      var pct=maxP>0?Math.round(cnt/maxP*100):0,color=pcColor(pct);
+      var wlist=ev.waitlist||[];
+      h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+      h+='<div style="font-size:17px;color:#7dba7d;font-weight:bold">'+ev.title+'</div>';
+      h+='<button onclick="closeModal()" style="background:none;border:none;color:#4a7a4a;font-size:22px;cursor:pointer">×</button></div>';
+      h+='<div style="background:#0d2b0d;border-radius:10px;padding:14px;margin-bottom:14px">';
+      h+='<div style="font-size:15px;color:#c8e8c8;margin-bottom:8px;font-weight:bold">📍 '+ev.course+'</div>';
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      var teeVal=ev.teeTimes&&ev.teeTimes.length>0?ev.teeTimes.join(", "):ev.teeTime||"미정";
+      [["📅 날짜",ev.date],["⏰ 티타임",teeVal],["🏌️ 그린피",ev.fee>0?"$"+ev.fee:"미정"],["📌 마감일",ev.deadline||"미정"]].forEach(function(x){
+        h+='<div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-bottom:2px">'+x[0]+'</div><div style="font-size:13px;color:#c8e8c8;font-family:sans-serif">'+x[1]+'</div></div>';
+      });
+      h+='</div></div>';
+      if(ev.description)h+='<div style="font-size:13px;color:#7a9a7a;line-height:1.7;font-family:sans-serif;padding:12px 0;border-top:1px solid #1a3a1a;border-bottom:1px solid #1a3a1a;margin-bottom:14px">'+ev.description+'</div>';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:#c8e8c8;font-size:13px">신청 현황</span><span style="color:'+color+';font-weight:bold;font-family:sans-serif;font-size:13px">'+cnt+' / '+maxP2+'명</span></div>';
+      h+='<div class="pb" style="margin-bottom:10px"><div class="pf" style="width:'+Math.min(pct,100)+'%;background:'+color+'"></div></div>';
+      h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">';
+      (ev.applicants||[]).forEach(function(name){
+        h+='<div style="background:'+(name===MY_NAME?"#1a3a1a":"#0d1a0d")+';border:1px solid '+(name===MY_NAME?"#3a7a3a":"#2a4a2a")+';border-radius:20px;padding:5px 10px;font-size:12px;font-family:sans-serif;color:'+(name===MY_NAME?"#7dba7d":"#c8e8c8")+'">'+name+(name===MY_NAME?' <span style="font-size:10px;color:#7dacff">나</span>':'')+'</div>';
+      });
+      if(!cnt)h+='<span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">아직 신청자가 없습니다</span>';
+      h+='</div>';
+      if(wlist.length>0){
+        h+='<div style="margin-bottom:12px"><div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:6px">⏳ 대기자 ('+wlist.length+'명)</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+        wlist.forEach(function(name,wi){
+          h+='<div style="background:'+(name===MY_NAME?"#2a2a00":"#0d1a0d")+';border:1px solid '+(name===MY_NAME?"#5a5a00":"#2a4a2a")+';border-radius:20px;padding:4px 10px;font-size:12px;font-family:sans-serif;color:'+(name===MY_NAME?"#ffe066":"#888")+'">'+(wi+1)+'. '+name+'</div>';
+        });
+        h+='</div></div>';
+      }
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #1a3a1a;margin-bottom:14px">';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif">주최: <span style="color:#c8e8c8">'+ev.organizer+'</span></div>';
+      if(ev.organizer===MY_NAME)h+='<button onclick="doDelEvent(\''+ev.id+'\')" style="background:#2a0a0a;border:1px solid #5a2a2a;color:#ff7070;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:sans-serif">🗑 삭제</button>';
+      h+='</div>';
+      if(ev.status==="모집중"){
+        if(applied)h+='<button class="btn-red btn-w" onclick="doApplyEv(\''+ev.id+'\')">❌  신청 취소하기</button>';
+        else if(waiting)h+='<button class="btn-w" style="background:linear-gradient(135deg,#5a4a00,#7a6a00);color:#ffe066;border:none;cursor:pointer" onclick="doApplyEv(\''+ev.id+'\')">⏳ 대기 '+wpos2+'번째 · 대기 취소하기</button>';
+        else if(full)h+='<button class="btn-w" style="background:linear-gradient(135deg,#1a2a3a,#2a3a4a);color:#7db8ff;border:none;cursor:pointer" onclick="doApplyEv(\''+ev.id+'\')">📋 대기 신청하기 (현재 '+wlist.length+'명 대기)</button>';
+        else h+='<button class="btn btn-w" onclick="doApplyEv(\''+ev.id+'\')">✅  참가 신청하기</button>';
+      }
+      h+='</div></div>';
+    }
+  }
+  else if(m && m.startsWith("editScore_")){
+    var sid=m.replace("editScore_",""),sc=S.scores.find(x=>x.id===sid);
+    if(sc){
+      h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+      h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">✏️ 스코어 수정</div>';
+      h+='<div style="font-size:13px;color:#c8e8c8;font-family:sans-serif;margin-bottom:14px">'+sc.memberName+'</div>';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">스코어 (현재: '+sc.score+'타)</div>';
+      h+='<input id="editScore" type="number" placeholder="새 스코어" style="margin-bottom:8px" />';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">골프장</div>';
+      h+='<select id="editCourseSelect" onchange="editSelectCourse(this.value)" style="margin-bottom:8px">';
+      h+='<option value="">현재: '+(sc.course||"없음")+'</option>';
+      COURSES.forEach(function(c){h+='<option value="'+c.name+'">'+c.name+'</option>';});
+      h+='<option value="직접입력">✏️ 직접 입력</option>';
+      h+='</select>';
+      h+='<div id="editCourseManual" style="display:none">';
+      h+='<input id="editCourse" placeholder="골프장 이름" style="margin-bottom:8px" />';
+      h+='<div class="two"><input id="editRating" type="number" step="0.1" placeholder="코스레이팅" /><input id="editSlope" type="number" placeholder="슬로프레이팅" /></div>';
+      h+='</div>';
+      h+='<div id="editCourseInfo" style="display:none" class="info-box"></div>';
+      h+='<input id="editScoreDate" type="date" value="'+(sc.date||'')+'" style="color-scheme:dark;margin-bottom:8px" />';
+      h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doUpdateScore(&quot;'+sid+'&quot;)">저장</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+      h+='</div></div>';
+    }
+  }
+  else if(m && m.startsWith("memberScores_")){
+    var mname=m.replace("memberScores_","");
+    var mscores=S.scores.filter(s=>s.memberName===mname).sort((a,b)=>a.date<b.date?1:-1);
+    var mem=S.members.find(x=>x.name===mname);
+    var mavg=mscores.length?Math.round(mscores.reduce((a,b)=>a+b.score,0)/mscores.length):0;
+    var mbest=mscores.length?Math.min(...mscores.map(s=>s.score)):0;
+    var mworst=mscores.length?Math.max(...mscores.map(s=>s.score)):0;
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
+    h+='<div style="font-size:17px;color:#7dba7d;font-weight:bold">'+mname+'님 기록</div>';
+    h+='<button onclick="closeModal()" style="background:none;border:none;color:#4a7a4a;font-size:22px;cursor:pointer">×</button></div>';
+    if(mem){
+      h+='<div style="display:flex;gap:6px;margin-bottom:14px">';
+      h+='<span class="badge bb">'+mem.role+'</span>';
+      h+='<span style="font-size:12px;color:#4a7a4a;font-family:sans-serif;padding:2px 8px">핸디캡 '+parseFloat(mem.handicap||0).toFixed(1)+'</span>';
+      h+='</div>';
+    }
+    if(mscores.length>0){
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">';
+      h+='<div style="background:#0d2b0d;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:bold;color:#7dba7d">'+mavg+'</div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-top:2px">평균</div></div>';
+      h+='<div style="background:#0d2b0d;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:bold;color:#ffd700">'+mbest+'</div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-top:2px">베스트</div></div>';
+      h+='<div style="background:#0d2b0d;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:bold;color:#c8e8c8">'+mscores.length+'</div><div style="font-size:10px;color:#4a7a4a;font-family:sans-serif;margin-top:2px">라운드</div></div>';
+      h+='</div>';
+      h+='<div style="border-top:1px solid #1a3a1a;padding-top:12px">';
+      mscores.forEach(function(s){
+        var isBest=s.score===mbest;
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a3a1a">';
+        h+='<div><div style="font-size:13px;color:#c8e8c8">'+(s.course||"코스 미기록")+'</div>';
+        h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+s.date+'</div></div>';
+        h+='<div style="display:flex;align-items:center;gap:8px">';
+        h+='<span style="font-size:18px;font-weight:bold;color:'+(isBest?"#ffd700":"#7dba7d")+'">'+s.score+(isBest?' 🏆':'')+'</span>';
+        h+='</div></div>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div style="text-align:center;padding:20px;font-size:13px;color:#4a7a4a;font-family:sans-serif">아직 기록이 없습니다</div>';
+    }
+    h+='</div></div>';
+  }
+  else if(m==="addScore"){
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">스코어 추가</div>';
+    h+='<select onchange="upd(\'sNew\',\'memberName\',this.value)"><option value="">회원 선택</option>';
+    S.members.forEach(function(m2){h+='<option value="'+m2.name+'">'+m2.name+'</option>';});
+    h+='</select>';
+    h+='<input type="number" placeholder="스코어 (타)" oninput="upd(\'sNew\',\'score\',this.value)" />';
+    // 골프장 프리셋 드롭다운
+    h+='<select id="courseSelect" onchange="selectCourse(this.value)">';
+    h+='<option value="">골프장 선택</option>';
+    COURSES.forEach(function(c){h+='<option value="'+c.name+'">'+c.name+' ('+c.rating+' / '+c.slope+')</option>';});
+    h+='<option value="직접입력">✏️ 직접 입력</option>';
+    h+='</select>';
+    h+='<div id="courseInfo" style="display:none" class="info-box"></div>';
+    h+='<div id="courseManual" style="display:none">';
+    h+='<input id="courseNameInput" placeholder="골프장 이름" oninput="upd(\'sNew\',\'course\',this.value)" />';
+    h+='<div class="two"><input id="ratingInput" type="number" step="0.1" placeholder="코스레이팅 (예:71.5)" oninput="upd(\'sNew\',\'courseRating\',this.value)" /><input id="slopeInput" type="number" placeholder="슬로프레이팅 (예:125)" oninput="upd(\'sNew\',\'slopeRating\',this.value)" /></div>';
+    h+='</div>';
+    var today=new Date().toISOString().slice(0,10);
+    h+='<div style="margin-bottom:8px">';
+    h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif;margin-bottom:4px">라운드 날짜</div>';
+    h+='<input type="date" value="'+today+'" max="'+today+'" oninput="upd(\'sNew\',\'date\',this.value)" style="color-scheme:dark;font-size:15px;padding:10px;text-align:center" />';
+    h+='</div>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddScore()">기록</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  else if(m==="addPost"){
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">글쓰기</div>';
+    h+='<select onchange="upd(\'pNew\',\'category\',this.value)"><option>일반</option><option>공지</option><option>후기</option><option>팁</option></select>';
+    h+='<input placeholder="제목" oninput="upd(\'pNew\',\'title\',this.value)" />';
+    h+='<textarea rows="4" placeholder="내용을 입력하세요..." oninput="upd(\'pNew\',\'content\',this.value)"></textarea>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddPost()">게시</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  else if(m==="addMember"){
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">새 회원 추가</div>';
+    h+='<input placeholder="이름" oninput="upd(\'mNew\',\'name\',this.value)" />';
+    h+='<input type="number" step="0.1" placeholder="핸디캡 (예:12.5)" oninput="upd(\'mNew\',\'handicap\',this.value)" />';
+    h+='<select onchange="upd(\'mNew\',\'role\',this.value)">';
+    ROLES.forEach(function(r){h+='<option value="'+r+'">'+r+'</option>';});
+    h+='</select>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddMember()">추가</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  else if(m && m.startsWith("editMember_")){
+    var mid2=m.replace("editMember_",""),mem2=S.members.find(x=>x.id===mid2);
+    if(mem2){
+      h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+      h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">👤 회원 정보 수정</div>';
+      h+='<div style="font-size:14px;color:#c8e8c8;margin-bottom:14px;font-family:sans-serif">'+mem2.name+'</div>';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:6px">직책</div>';
+      h+='<select id="editRole" style="margin-bottom:14px">';
+      ROLES.forEach(function(r){h+='<option value="'+r+'"'+(mem2.role===r?" selected":"")+'>'+r+'</option>';});
+      h+='</select>';
+      h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;margin-bottom:6px">핸디캡 (현재: '+parseFloat(mem2.handicap||0).toFixed(1)+')</div>';
+      h+='<input id="editHandicap" type="number" step="0.1" placeholder="새 핸디캡 (변경 시 입력)" style="margin-bottom:14px" />';
+      h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doUpdateMember(\''+mid2+'\')">저장</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+      h+='</div></div>';
+    }
+  }
+  else if(m && m.startsWith("editHandi_")){
+    var mid3=m.replace("editHandi_",""),mem3=S.members.find(x=>x.id===mid3);
+    if(mem3){
+      h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+      h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:6px;font-weight:bold">🏅 핸디캡 수정</div>';
+      h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif;margin-bottom:16px">'+mem3.name+' · 현재: <span style="color:#7dba7d;font-weight:bold">'+parseFloat(mem3.handicap||0).toFixed(1)+'</span></div>';
+      h+='<input type="number" step="0.1" placeholder="새 핸디캡" id="newHandi" style="font-size:20px;text-align:center" />';
+      h+='<div style="display:flex;gap:8px"><button class="btn" onclick="submitHandi(\''+mid3+'\')">저장</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+      h+='</div></div>';
+    }
+  }
+  else if(m==="addDue"){
+    var cy2=new Date().getFullYear();
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">💰 회비 납부 등록</div>';
+    h+='<select onchange="upd(\'dNew\',\'memberName\',this.value)"><option value="">회원 선택</option>';
+    S.members.forEach(function(m2){h+='<option value="'+m2.name+'">'+m2.name+'</option>';});
+    h+='</select>';
+    h+='<select onchange="upd(\'dNew\',\'year\',this.value)"><option value="">연도 선택</option>';
+    [cy2,cy2-1,cy2+1].forEach(function(y){h+='<option value="'+y+'">'+y+'년</option>';});
+    h+='</select>';
+    h+='<input type="date" oninput="upd(\'dNew\',\'paidDate\',this.value)" />';
+    h+='<input placeholder="메모 (선택)" oninput="upd(\'dNew\',\'note\',this.value)" />';
+    h+='<div class="info-box">납부 금액: <strong>$'+ANNUAL_FEE+'</strong></div>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddDue()">등록</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  else if(m==="addBirdie"){
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">🐦 버디 등록</div>';
+    h+='<select onchange="upd(\'bNew\',\'memberName\',this.value)"><option value="">회원 선택</option>';
+    S.members.forEach(function(m2){h+='<option value="'+m2.name+'">'+m2.name+'</option>';});
+    h+='</select>';
+    h+='<input type="number" placeholder="버디 수 (개)" min="1" id="birdieCount" oninput="upd(\'bNew\',\'count\',this.value);updBirdieAmt(this.value)" />';
+    h+='<input placeholder="골프장 (선택)" oninput="upd(\'bNew\',\'course\',this.value)" />';
+    h+='<input type="date" oninput="upd(\'bNew\',\'date\',this.value)" />';
+    h+='<div id="birdieAmt" class="info-box">납부 금액: <strong>$0</strong> (버디 0개 × $'+BIRDIE_FEE+')</div>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddBirdie()">등록</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  else if(m==="addRule"){
+    h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
+    h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">📋 규정 추가</div>';
+    h+='<select onchange="upd(\'rNew\',\'category\',this.value)">';
+    ["벌타","OB/워터해저드","버디/이글","회비/벌금","기타"].forEach(function(c){h+='<option value="'+c+'">'+c+'</option>';});
+    h+='</select>';
+    h+='<input placeholder="규정 제목" oninput="upd(\'rNew\',\'title\',this.value)" />';
+    h+='<textarea rows="4" placeholder="규정 내용을 입력하세요..." oninput="upd(\'rNew\',\'content\',this.value)"></textarea>';
+    h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddRule()">추가</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
+    h+='</div></div>';
+  }
+  return h;
+}
+
+// 전역 함수
+window.setTab = t=>{S.tab=t;R();};
+window.openModal = m=>{S.modal=m;R();};
+window.closeModal = ()=>{S.modal=null;R();};
+window.showDetail = id=>{S.modal="detail_"+id;R();};
+window.openMemberEdit = id=>{S.modal="editMember_"+id;R();};
+window.doApplyEv = id=>{var ev=S.events.find(e=>e.id===id);if(ev)doApply(ev);};
+window.doDelScore = doDelScore;
+window.doUpdateScore = doUpdateScore;
+window.showMemberScores = name => { S.modal="memberScores_"+name; R(); };
+window.openScoreEdit = id => { S.modal="editScore_"+id; R(); };
+window.editSelectCourse = function(val){
+  var manual=document.getElementById("editCourseManual");
+  var info=document.getElementById("editCourseInfo");
+  var courseInput=document.getElementById("editCourse");
+  var ratingInput=document.getElementById("editRating");
+  var slopeInput=document.getElementById("editSlope");
+  if(val==="직접입력"){
+    if(manual)manual.style.display="block";
+    if(info)info.style.display="none";
+  } else if(val===""){
+    if(manual)manual.style.display="none";
+    if(info)info.style.display="none";
+  } else {
+    var found=COURSES.find(c=>c.name===val);
+    if(found){
+      if(manual)manual.style.display="none";
+      if(courseInput)courseInput.value=found.name;
+      if(ratingInput)ratingInput.value=found.rating;
+      if(slopeInput)slopeInput.value=found.slope;
+      if(info){info.style.display="block";info.innerHTML="📍 "+found.name+"<br>코스레이팅: <strong>"+found.rating+"</strong> · 슬로프레이팅: <strong>"+found.slope+"</strong>";}
+      document.getElementById("editCourseManual").style.display="block";
+    }
+  }
+};
+window.doDelEvent = doDelEvent;
+window.doUpdateEvent = doUpdateEvent;
+window.openEditEvent = id => { S.modal='editEvent_'+id; R(); };
+window.doAddEvent = doAddEvent;
+window.doAddScore = doAddScore;
+window.doAddPost = doAddPost;
+window.doAddMember = doAddMember;
+window.doUpdateMember = doUpdateMember;
+window.doAddDue = doAddDue;
+window.doDelDue = doDelDue;
+window.doQuickPay = doQuickPay;
+window.doAddBirdie = doAddBirdie;
+window.doToggleBirdie = doToggleBirdie;
+window.doDelBirdie = doDelBirdie;
+window.doAddRule = doAddRule;
+window.doDelRule = doDelRule;
+window.doDelTournament = doDelTournament;
+window.updCupRank = function(i,val){
+  if(!S.newCupPlayers) return;
+  S.newCupPlayers[i].rank=parseInt(val)||0;
+  S.newCupPlayers[i].points=val?CUP_POINTS[parseInt(val)-1]||0:0;
+  R();
+};
+window.updCupName = function(i,val){ if(S.newCupPlayers) S.newCupPlayers[i].name=val; R(); };
+window.addCupPlayer = function(){ if(!S.newCupPlayers) S.newCupPlayers=[]; S.newCupPlayers.push({name:"",rank:0,points:0}); R(); };
+window.removeCupPlayer = function(i){ if(S.newCupPlayers) S.newCupPlayers.splice(i,1); R(); };
+window.saveCupResult = async function(){
+  var curMonth=Math.min(new Date().getMonth()+1, CUP_END_MONTH);
+  var curMonthKey=CUP_YEAR+"-"+String(curMonth).padStart(2,"0");
+  var players=(S.newCupPlayers||[]).filter(function(p){return p.name&&p.rank;});
+  if(players.length===0){alert("참가자를 입력해주세요!");return;}
+  var existing=S.cupResults.find(function(r){return r.month===curMonthKey;});
+  if(existing){
+    await updateDoc(doc(db,"cup_results",existing.id),{results:players,updatedAt:new Date().toISOString()});
+  } else {
+    await addDoc(collection(db,"cup_results"),{month:curMonthKey,year:CUP_YEAR,results:players,createdAt:new Date().toISOString()});
+  }
+  // 게시판 공지
+  var postContent=CUP_YEAR+"년 "+curMonth+"월 골통컵 포인트\n\n";
+  players.sort(function(a,b){return a.rank-b.rank;}).forEach(function(p){
+    var medal=p.rank===1?"🥇":p.rank===2?"🥈":p.rank===3?"🥉":"";
+    postContent+=medal+(medal?" ":p.rank+"위 ")+p.name+" +"+p.points+"점\n";
+  });
+  await addDoc(collection(db,"posts"),{title:"[골통컵] "+curMonth+"월 포인트 업데이트",content:postContent,author:MY_NAME,date:new Date().toISOString().slice(0,10),likes:0,category:"공지"});
+  S.newCupPlayers=null; S.modal=null; R();
+  alert(curMonth+"월 골통컵 포인트가 저장되고 공지됐어요! ⭐");
+};
+window.setTournamentTab = function(t){ S.tournamentTab=t; if(t==="new") S.newTournament={title:"",date:new Date().toISOString().slice(0,7),course:"",players:[]}; R(); };
+window.updTournament = function(key,val){ if(!S.newTournament) S.newTournament={}; S.newTournament[key]=val; R(); };
+window.addTournamentPlayer = function(){
+  if(!S.newTournament) S.newTournament={players:[]};
+  if(!S.newTournament.players) S.newTournament.players=[];
+  // 아직 추가 안된 회원 자동 선택
+  var usedNames=S.newTournament.players.map(function(p){return p.name;});
+  var nextMember=S.members.find(function(m){return !usedNames.includes(m.name);});
+  var handicap=nextMember?parseFloat(nextMember.handicap||0):0;
+  S.newTournament.players.push({name:nextMember?nextMember.name:"",gross:"",handicap:handicap});
+  R();
+};
+window.removeTournamentPlayer = function(i){ S.newTournament.players.splice(i,1); R(); };
+window.updPlayer = function(i,key,val){
+  if(!S.newTournament||!S.newTournament.players) return;
+  S.newTournament.players[i][key]=val;
+  // 회원 선택 시 핸디캡 자동 입력
+  if(key==="name"){
+    var mem=S.members.find(function(m){return m.name===val;});
+    if(mem) S.newTournament.players[i].handicap=parseFloat(mem.handicap||0);
+  }
+  R();
+};
+window.saveTournamentResult = async function(){
+  var form=S.newTournament||{};
+  if(!form.title||!form.players||form.players.length===0){ alert("대회명과 참가자를 입력해주세요!"); return; }
+  var validPlayers=form.players.filter(function(p){return p.name&&p.gross;});
+  if(validPlayers.length===0){ alert("스코어를 입력해주세요!"); return; }
+
+  var results=validPlayers.map(function(p){
+    return {
+      name:p.name,
+      gross:parseInt(p.gross),
+      handicap:parseFloat(p.handicap||0),
+      net:parseInt(p.gross)-parseFloat(p.handicap||0)
+    };
+  }).sort(function(a,b){return a.net-b.net;});
+
+  var course=form.course==="직접입력"?(form.courseName||""):form.course;
+  var tournamentData={
+    title:form.title,
+    date:form.date||new Date().toISOString().slice(0,7),
+    course:course,
+    results:results,
+    createdAt:new Date().toISOString()
+  };
+  await doSaveTournament(tournamentData);
+
+  // 게시판에 공지 자동 등록
+  var rank=["🥇","🥈","🥉"];
+  var postContent=form.title+" 결과 발표\n\n";
+  results.forEach(function(r,i){
+    postContent+=(i<3?rank[i]:(i+1)+"위")+" "+r.name+" | 총 "+r.gross+"타 - 핸디 "+r.handicap+" = Net "+( r.net>0?"+":"")+r.net+"\n";
+  });
+  postContent+="\n🏌️ 수고하셨습니다!";
+  await addDoc(collection(db,"posts"),{
+    title:"[대회결과] "+form.title,
+    content:postContent,
+    author:MY_NAME,
+    date:new Date().toISOString().slice(0,10),
+    likes:0,
+    category:"공지"
+  });
+
+  alert("대회 결과가 저장되고 게시판에 공지됐어요! 🏆");
+  S.tournamentTab="list";
+  S.newTournament=null;
+  R();
+};
+window.doLikePost = id=>{var p=S.posts.find(x=>x.id===id);if(p)doLike(p);};
+window.setDuesTab = t=>{S.duesTab=t;R();};
+window.setDuesYear = y=>{S.duesYear=parseInt(y);R();};
+window.submitHandi = id=>{var v=document.getElementById("newHandi").value;if(v)doUpdateHandi(id,v);};
+window.upd = (obj,key,val)=>{S[obj][key]=val;};
+window.updBirdieAmt = cnt=>{var el=document.getElementById("birdieAmt");if(el)el.innerHTML='납부 금액: <strong>$'+(parseInt(cnt)||0)*BIRDIE_FEE+'</strong> (버디 '+(parseInt(cnt)||0)+'개 × $'+BIRDIE_FEE+')';};
+window.selectEvCourse = function(val){
+  if(!S.eNew) S.eNew={};
+  S.eNew.course=val;
+  var manual=document.getElementById("evCourseManual");
+  if(val==="직접입력"){
+    if(manual) manual.style.display="block";
+  } else {
+    if(manual) manual.style.display="none";
+  }
+  R();
+};
+window.selectCourse = function(val){
+  var info=document.getElementById("courseInfo");
+  var manual=document.getElementById("courseManual");
+  if(val==="직접입력"){
+    if(manual)manual.style.display="block";
+    if(info)info.style.display="none";
+    S.sNew.course="";S.sNew.courseRating=null;S.sNew.slopeRating=null;
+  } else if(val===""){
+    if(manual)manual.style.display="none";
+    if(info)info.style.display="none";
+  } else {
+    var found=COURSES.find(function(c){return c.name===val;});
+    if(found){
+      S.sNew.course=found.name;S.sNew.courseRating=found.rating;S.sNew.slopeRating=found.slope;
+      if(manual)manual.style.display="none";
+      if(info){info.style.display="block";info.innerHTML="📍 "+found.name+"<br>코스레이팅: <strong>"+found.rating+"</strong> · 슬로프레이팅: <strong>"+found.slope+"</strong>";}
+    }
+  }
+};
+window.scanScoreCard = async function(input){
+  var file=input.files[0];
+  if(!file) return;
+  S.modal="scanScore_loading"; R();
+  try {
+    var base64=await new Promise(function(resolve,reject){
+      var reader=new FileReader();
+      reader.onload=function(e){ resolve(e.target.result.split(",")[1]); };
+      reader.onerror=reject;
+      reader.readAsDataURL(file);
+    });
+    var today=new Date().toISOString().slice(0,10);
+    var memberNames=S.members.map(function(m){return m.name;}).join(", ");
+    var courseInfo=COURSES.map(function(c){return c.name+"(코스레이팅:"+c.rating+",슬로프레이팅:"+c.slope+")";}).join(", ");
+    var courseNames="Chicopee Woods School & Village, Chicopee Woods Mill & School, Chicopee Woods Village & Mill, Royal Lakes, Sugar Hill Golf Course";
+    var response=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        messages:[{
+          role:"user",
+          content:[
+            {type:"image",source:{type:"base64",media_type:file.type,data:base64}},
+            {type:"text",text:"이 골프 스코어카드를 분석해서 각 플레이어의 총 스코어를 JSON 배열로 반환해 주세요. "+
+              "회원 이름은 다음 중에서 가장 유사한 것으로 매칭해주세요: "+memberNames+". "+
+              "골프장은 다음 중 하나로 매칭하고 해당 코스레이팅과 슬로프레이팅도 포함해주세요: "+courseInfo+". "+
+              "오늘 날짜는 "+today+". "+
+              "반드시 JSON 배열만 반환하세요. "+
+              "각 항목은 memberName, score, course, courseRating, slopeRating, date 필드를 포함하세요."}
+          ]
+        }]
+      })
+    });
+    var data=await response.json();
+    var text=data.content.map(function(c){return c.text||"";}).join("");
+    var clean=text.replace(/```json|```/g,"").trim();
+    var results=JSON.parse(clean);
+    S.scanResult=results;
+    S.modal="scanScore_result";
+  } catch(e) {
+    console.error(e);
+    S.scanResult=[];
+    S.modal="scanScore_result";
+  }
+  R();
+};
+
+window.updateScanMember = function(i,val){ if(S.scanResult&&S.scanResult[i]) S.scanResult[i].memberName=val; };
+window.updateScanScore = function(i,val){ if(S.scanResult&&S.scanResult[i]) S.scanResult[i].score=parseInt(val); };
+window.saveScanResults = async function(){
+  var results=S.scanResult||[];
+  var saved=0;
+  for(var i=0;i<results.length;i++){
+    var r=results[i];
+    if(!r.memberName||!r.score) continue;
+
+    // ESC 적용 스코어 계산
+    var finalScore=parseInt(r.score);
+    var escApplied=false;
+    if(r.holes&&r.holes.length>=18&&r.slopeRating){
+      var mem=S.members.find(function(m){return m.name===r.memberName;});
+      if(mem&&mem.handicap){
+        var courseHandi=calcCourseHandicap(mem.handicap, r.slopeRating);
+        var escScore=applyESC(r.holes, courseHandi);
+        if(escScore!==null){
+          finalScore=escScore;
+          escApplied=true;
+        }
+      }
+    }
+
+    await addDoc(collection(db,"scores"),{
+      memberName:r.memberName,
+      score:finalScore,
+      rawScore:parseInt(r.score),
+      escApplied:escApplied,
+      holes:r.holes||[],
+      course:r.course||"",
+      date:r.date||new Date().toISOString().slice(0,10),
+      courseRating:r.courseRating||null,
+      slopeRating:r.slopeRating||null
+    });
+    (function(name){ setTimeout(function(){doAutoHandi(name);},1500); })(r.memberName);
+    saved++;
+  }
+  var escMsg=results.some(function(r){return r.holes&&r.holes.length>=18;})?" (ESC 자동 적용)":"";
+  alert(saved+"명의 스코어가 저장됐어요!"+escMsg);
+  S.scanResult=[];
+  S.modal=null;
+  R();
+};
+
+window.toggleSomMember = function(name){
+  var idx=S.somSelected.indexOf(name);
+  if(idx>=0) S.somSelected.splice(idx,1);
+  else S.somSelected.push(name);
+  R();
+};
+window.setSomSize = function(n){ S.somSize=n; R(); };
+window.doDrawSom = function(){
+  var members=[...S.somSelected];
+  if(members.length<2){ alert("2명 이상 선택해주세요!"); return; }
+  // 랜덤 셔플
+  for(var i=members.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=members[i]; members[i]=members[j]; members[j]=tmp;
+  }
+  // 조 나누기
+  var size=S.somSize||4;
+  var groups=[];
+  for(var i=0;i<members.length;i+=size){
+    groups.push(members.slice(i,i+size));
+  }
+  S.somResult=groups;
+  R();
+};
+window.reqNotif = async function(){
+  if(!('Notification' in window)){ alert("이 브라우저는 알림을 지원하지 않아요"); return; }
+  var perm = await Notification.requestPermission();
+  if(perm==='granted'){
+    sendNotification("🔔 골통회 알림 설정 완료!", "이제 새 이벤트와 게시글 알림을 받을 수 있어요!", "test");
+  } else {
+    alert("알림을 허용해 주세요!\n브라우저 설정 → 사이트 설정 → 알림 허용");
+  }
+  R();
+};
+window.changeName = function(){if(confirm("이름을 변경할까요?")){localStorage.removeItem("golfMyName");MY_NAME="";R();}};
+
+if(MY_NAME) initNotifications();
+
+// 2월 골통컵 데이터 seed (최초 1회 - onSnapshot 로드 후 실행)
+setTimeout(async function(){
+  if(!MY_NAME) return;
+  if(S.cupResults.find(function(r){return r.month==="2026-02";})) return;
+  var febData=[
+    {name:"박창범",rank:1,points:15},
+    {name:"이철규",rank:2,points:12},
+    {name:"김동일",rank:3,points:10},
+    {name:"손성훈",rank:4,points:9},
+    {name:"한용민",rank:5,points:8},
+    {name:"한용수",rank:6,points:7},
+    {name:"이상준",rank:7,points:6},
+    {name:"문기혁",rank:8,points:5},
+    {name:"엄희영",rank:9,points:5}
+  ];
+  await addDoc(collection(db,"cup_results"),{month:"2026-02",year:2026,results:febData,createdAt:new Date().toISOString()});
+}, 3000);
+
+R();
+</script>
+
+<div id="app">
+  <div class="loading">
+    <div>
+      <div style="font-size:48px;margin-bottom:16px">⛳</div>
+      <div style="color:#7dba7d;font-family:sans-serif">불러오는 중...</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
