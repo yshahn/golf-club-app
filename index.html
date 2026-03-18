@@ -227,7 +227,7 @@ async function doApply(ev, action){
   S.modal=null; R();
   await updateDoc(doc(db,"events",evId),{applicants:apps,waitlist:wait,absentees:absent,maybes:maybe});
 }
-}
+
 async function doUpdateEvent(id){
   const title=document.getElementById("editEvTitle").value;
   const date=document.getElementById("editEvDate").value;
