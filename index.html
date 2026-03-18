@@ -2039,13 +2039,13 @@ window.uploadBanner = async function(input){
       reader.onload=function(e){
         img.onload=function(){
           var canvas=document.createElement("canvas");
-          var maxW=1200, maxH=400;
+          var maxW=800, maxH=300;
           var ratio=Math.min(maxW/img.width, maxH/img.height, 1);
           canvas.width=Math.round(img.width*ratio);
           canvas.height=Math.round(img.height*ratio);
           var ctx=canvas.getContext("2d");
           ctx.drawImage(img,0,0,canvas.width,canvas.height);
-          resolve(canvas.toDataURL("image/jpeg",0.7));
+          resolve(canvas.toDataURL("image/jpeg",0.5));
         };
         img.onerror=reject;
         img.src=e.target.result;
