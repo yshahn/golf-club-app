@@ -197,19 +197,36 @@ function calcUSGA(name){
 }
 
 // 액션
-async function doApply(ev){
-  const ref=doc(db,"events",ev.id),apps=ev.applicants||[],wait=ev.waitlist||[];
-  if(apps.includes(MY_NAME)){
-    const newApps=apps.filter(a=>a!==MY_NAME);
-    if(wait.length>0){await updateDoc(ref,{applicants:[...newApps,wait[0]],waitlist:wait.slice(1)});}
-    else{await updateDoc(ref,{applicants:newApps});}
-  } else if(wait.includes(MY_NAME)){
-    await updateDoc(ref,{waitlist:wait.filter(a=>a!==MY_NAME)});
-  } else if(apps.length<ev.maxParticipants){
-    await updateDoc(ref,{applicants:[...apps,MY_NAME]});
+async function doApply(ev, action){
+  var evId=ev.id;
+  var apps=[...(ev.applicants||[])], wait=[...(ev.waitlist||[])];
+  var absent=[...(ev.absentees||[])], maybe=[...(ev.maybes||[])];
+  var maxP=parseInt(ev.maxParticipants||8);
+  apps=apps.filter(function(a){return a!==MY_NAME;});
+  wait=wait.filter(function(a){return a!==MY_NAME;});
+  absent=absent.filter(function(a){return a!==MY_NAME;});
+  maybe=maybe.filter(function(a){return a!==MY_NAME;});
+  if(action==="join"){
+    if(apps.length<maxP) apps.push(MY_NAME);
+    else wait.push(MY_NAME);
+  } else if(action==="absent"){
+    absent.push(MY_NAME);
+    if(wait.length>0&&apps.length<maxP) apps.push(wait.shift());
+  } else if(action==="maybe"){
+    maybe.push(MY_NAME);
   } else {
-    await updateDoc(ref,{waitlist:[...wait,MY_NAME]});
+    if((ev.applicants||[]).includes(MY_NAME)||(ev.waitlist||[]).includes(MY_NAME)){
+      absent.push(MY_NAME);
+      if(wait.length>0&&apps.length<maxP) apps.push(wait.shift());
+    } else {
+      if(apps.length<maxP) apps.push(MY_NAME); else wait.push(MY_NAME);
+    }
   }
+  var idx=S.events.findIndex(function(e){return e.id===evId;});
+  if(idx>=0){ S.events[idx].applicants=apps; S.events[idx].waitlist=wait; S.events[idx].absentees=absent; S.events[idx].maybes=maybe; }
+  S.modal=null; R();
+  await updateDoc(doc(db,"events",evId),{applicants:apps,waitlist:wait,absentees:absent,maybes:maybe});
+}
 }
 async function doUpdateEvent(id){
   const title=document.getElementById("editEvTitle").value;
