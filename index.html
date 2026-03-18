@@ -1876,7 +1876,7 @@ window.scanScoreCard = async function(input){
               "회원 이름은 다음 중에서 가장 유사한 것으로 매칭해주세요: "+memberNames+". "+
               "골프장은 다음 중 하나로 매칭하고 해당 코스레이팅과 슬로프레이팅도 포함해주세요: "+courseInfo+". "+
               "오늘 날짜는 "+today+". "+
-              "반드시 JSON 배열만 반환하세요. "+
+              "스코어가 오버 타수(예: +14, 14오버)로 적혀 있으면 파72 기준으로 총 타수로 변환해 주세요(예: +14 → 86). "+ "반드시 JSON 배열만 반환하세요. "+
               "각 항목은 memberName, score, course, courseRating, slopeRating, date 필드를 포함하세요."}
           ]
         }]
