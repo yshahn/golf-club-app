@@ -101,8 +101,8 @@ let MY_NAME = localStorage.getItem("golfMyName") || "";
 let S = {
   tab:"home", somSelected:[], somSize:4, somResult:null, somMode:"random", tournamentTab:"list",
   bannerUrl: null, modal:null, duesTab:"dues", duesYear:new Date().getFullYear(),
-  members:[], events:[], scores:[], posts:[], dues:[], birdies:[], rules:[], tournaments:[], cupResults:[], liked:[],
-  eNew:{}, sNew:{}, pNew:{category:"일반"}, mNew:{role:"회원"}, dNew:{}, bNew:{}, rNew:{category:"벌타",title:"",content:""}
+  members:[], events:[], scores:[], posts:[], dues:[], birdies:[], rules:[], tournaments:[], cupResults:[], ledger:[], liked:[],
+  eNew:{}, sNew:{}, pNew:{category:"일반"}, mNew:{role:"회원"}, dNew:{}, bNew:{}, lNew:{}, rNew:{category:"벌타",title:"",content:""}
 };
 
 onSnapshot(collection(db,"members"), s=>{S.members=s.docs.map(d=>({id:d.id,...d.data()}));R();});
@@ -139,6 +139,7 @@ onSnapshot(query(collection(db,"posts"),orderBy("date","desc")), s=>{
 });
 onSnapshot(collection(db,"dues"), s=>{S.dues=s.docs.map(d=>({id:d.id,...d.data()}));R();});
 onSnapshot(query(collection(db,"birdies"),orderBy("date","desc")), s=>{S.birdies=s.docs.map(d=>({id:d.id,...d.data()}));R();});
+onSnapshot(query(collection(db,"ledger"),orderBy("date","asc")), s=>{S.ledger=s.docs.map(d=>({id:d.id,...d.data()}));R();});  
 onSnapshot(collection(db,"rules"), s=>{S.rules=s.docs.map(d=>({id:d.id,...d.data()}));R();});
 onSnapshot(query(collection(db,"tournaments"),orderBy("date","desc")), s=>{S.tournaments=s.docs.map(d=>({id:d.id,...d.data()}));R();});
 onSnapshot(query(collection(db,"cup_results"),orderBy("month","asc")), s=>{S.cupResults=s.docs.map(d=>({id:d.id,...d.data()}));R();});
@@ -365,7 +366,7 @@ async function doDelTournament(id){
   if(confirm("대회 결과를 삭제할까요?")) await deleteDoc(doc(db,"tournaments",id));
 }
 
-async function doDelRule(id){if(confirm("삭제할까요?"))await deleteDoc(doc(db,"rules",id));}
+async function doAddLedger(){   const l=S.lNew;if(!l.memo||!l.amount){alert("메모와 금액 필수!");return;}   await addDoc(collection(db,"ledger"),{memo:l.memo,amount:parseFloat(l.amount),method:l.method||"",date:l.date||new Date().toISOString().slice(0,10)});   S.lNew={};S.modal=null;R(); } async function doDelLedger(id){if(confirm("삭제할까요?"))await deleteDoc(doc(db,"ledger",id));} async function doDelRule(id){if(confirm("삭제할까요?"))await deleteDoc(doc(db,"rules",id));}
 
 // 렌더링
 function R(){
@@ -829,10 +830,11 @@ function pgDues(){
 
   var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
   h+='<div class="sec" style="margin:0">💰 회비 관리</div>';
-  h+='<button class="btn" onclick="openModal(\''+(at==="birdies"?"addBirdie":"addDue")+'\')">+ '+(at==="birdies"?"버디 등록":"납부 등록")+'</button></div>';
+  h+='<button class="btn" onclick="openModal(\''+(at==="birdies"?"addBirdie":at==="ledger"?"addLedger":"addDue")+'\')">+ '+(at==="birdies"?"버디 등록":"납부 등록")+'</button></div>';
   h+='<div class="tab-bar">';
   h+='<button class="tab-btn" onclick="setDuesTab(\'dues\')" style="background:'+(at==="dues"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="dues"?"#b8eab8":"#4a7a4a")+'">🏦 연회비</button>';
   h+='<button class="tab-btn" onclick="setDuesTab(\'birdies\')" style="background:'+(at==="birdies"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="birdies"?"#b8eab8":"#4a7a4a")+'">🐦 버디값</button>';
+  h+='<button class="tab-btn" onclick="setDuesTab(\'ledger\')" style="background:\'+(at==="ledger"?"#2a5a2a":"#0d1a0d")+\';color:\'+(at==="ledger"?"#b8eab8":"#4a7a4a")+\'">📊 운영내역</button>\';
   h+='</div>';
 
   if(at==="dues"){
@@ -888,10 +890,7 @@ function pgDues(){
       });
     }
   }
-  return h;
-}
-
-function pgBoard(){
+  if(at==="ledger"){     var totalDues=S.dues.filter(function(d){return d.year==new Date().getFullYear();}).length*ANNUAL_FEE;     var expenses=S.ledger||[];     var totalExp=expenses.reduce(function(a,b){return a+parseFloat(b.amount||0);},0);     var balance=totalDues-totalExp;     var balColor=balance>=0?"#7dba7d":"#ff7070";     h+='<div style="background:linear-gradient(135deg,#0d2b0d,#122212);border:1px solid #2a5a2a;border-radius:12px;padding:16px;margin-bottom:12px">';     h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">';     h+='<div style="text-align:center"><div style="font-size:20px;font-weight:bold;color:#7dba7d">$'+totalDues+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">총 수입</div></div>';     h+='<div style="text-align:center"><div style="font-size:20px;font-weight:bold;color:#ff7070">$'+totalExp.toFixed(2)+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">총 지출</div></div>';     h+='<div style="text-align:center"><div style="font-size:20px;font-weight:bold;color:'+balColor+'">$'+balance.toFixed(2)+'</div><div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">잔액</div></div>';     h+='</div></div>';     h+='<div class="card"><div class="sec">📋 지출 내역</div>';     if(expenses.length===0)h+='<div style="font-size:13px;color:#4a7a4a;font-family:sans-serif">지출 내역이 없습니다</div>';     var running=totalDues;     expenses.forEach(function(e){       running-=parseFloat(e.amount||0);       h+='<div class="row"><div style="flex:1"><div style="font-size:14px;color:#c8e8c8">'+e.memo+'</div>';       h+='<div style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+e.date+(e.method?' · '+e.method:'')+'</div></div>';       h+='<div style="display:flex;align-items:center;gap:8px"><div style="text-align:right"><div style="font-size:14px;color:#ff7070;font-weight:bold">-$'+parseFloat(e.amount).toFixed(2)+'</div>';       h+='<div style="font-size:11px;color:'+(running>=0?"#7dba7d":"#ff7070")+';font-family:sans-serif">잔액 $'+running.toFixed(2)+'</div></div>';       h+='<button onclick="doDelLedger(\''+e.id+'\')" style="background:none;border:none;color:#4a7a4a;cursor:pointer;font-size:14px">🗑</button></div></div>';     });     h+='</div>';   }   return h; }  function pgBoard(){
   var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
   h+='<div class="sec" style="margin:0">게시판</div>';
   h+='<button class="btn" onclick="openModal(\'addPost\')">+ 글쓰기</button></div>';
@@ -1637,7 +1636,7 @@ function renderModal(){
     h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddBirdie()">등록</button><button class="btn-out" onclick="closeModal()">취소</button></div>';
     h+='</div></div>';
   }
-  else if(m==="addRule"){
+  else if(m==="addLedger"){     h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';     h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">📊 지출 등록</div>';     h+='<input placeholder="메모 (예: golfnow, Gift card)" oninput="upd(\'lNew\',\'memo\',this.value)" />';     h+='<input type="number" step="0.01" placeholder="금액 (예: 27.56)" oninput="upd(\'lNew\',\'amount\',this.value)" />';     h+='<input placeholder="결제 수단 (선불카드, golfnow...)" oninput="upd(\'lNew\',\'method\',this.value)" />';     h+='<input type="date" oninput="upd(\'lNew\',\'date\',this.value)" />';     h+='<div style="display:flex;gap:8px"><button class="btn" onclick="doAddLedger()">등록</button><button class="btn-out" onclick="closeModal()">취소</button></div>';     h+='</div></div>';   }   else if(m==="addRule"){
     h='<div class="modal" onclick="closeModal()"><div class="mbox" onclick="event.stopPropagation()">';
     h+='<div style="font-size:16px;color:#7dba7d;margin-bottom:16px;font-weight:bold">📋 규정 추가</div>';
     h+='<select onchange="upd(\'rNew\',\'category\',this.value)">';
@@ -1702,7 +1701,7 @@ window.doAddBirdie = doAddBirdie;
 window.doToggleBirdie = doToggleBirdie;
 window.doDelBirdie = doDelBirdie;
 window.doAddRule = doAddRule;
-window.doDelRule = doDelRule;
+window.doDelRule = doDelRule; window.doAddLedger = doAddLedger; window.doDelLedger = doDelLedger;
 window.doDelTournament = doDelTournament;
 window.updCupRank = function(i,val){
   if(!S.newCupPlayers) return;
