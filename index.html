@@ -896,16 +896,6 @@ function pgDues(){
     }
   }
   
-  h+='<div class="sec" style="margin:0">게시판</div>';
-  h+='<button class="btn" onclick="openModal(\'addPost\')">+ 글쓰기</button></div>';
-  S.posts.forEach(function(p){
-    var bc=p.category==="공지"?"bo":p.category==="후기"?"bg":p.category==="팁"?"bb":"bx";
-    h+='<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="badge '+bc+'">'+p.category+'</span><span style="font-size:11px;color:#4a7a4a;font-family:sans-serif">'+p.date+'</span></div>';
-    h+='<div style="font-size:15px;color:#c8e8c8;font-weight:bold;margin-bottom:6px">'+p.title+'</div>';
-    h+='<div style="font-size:13px;color:#7a9a7a;line-height:1.6;margin-bottom:10px;font-family:sans-serif">'+p.content+'</div>';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">'+p.author+'</span>';
-    h+='<button onclick="doLikePost(\''+p.id+'\')" style="background:none;border:none;cursor:pointer;color:'+(S.liked.includes(p.id)?"#ff6666":"#4a7a4a")+';font-size:13px;font-family:sans-serif;display:flex;align-items:center;gap:4px">'+(S.liked.includes(p.id)?"❤️":"🤍")+' '+(p.likes||0)+'</button></div></div>';
-  });
 return h;
 }
 
