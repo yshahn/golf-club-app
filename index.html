@@ -812,6 +812,7 @@ function pgHandicap(){
 }
 
 function pgDues(){
+  var h='';
   var cy=new Date().getFullYear(),sy=S.duesYear||cy;
   var at=S.duesTab||"dues";
   var paid=S.dues.filter(d=>d.year==sy);
