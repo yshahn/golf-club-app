@@ -906,7 +906,7 @@ function pgDues(){
     h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#4a7a4a;font-family:sans-serif">'+p.author+'</span>';
     h+='<button onclick="doLikePost(\''+p.id+'\')" style="background:none;border:none;cursor:pointer;color:'+(S.liked.includes(p.id)?"#ff6666":"#4a7a4a")+';font-size:13px;font-family:sans-serif;display:flex;align-items:center;gap:4px">'+(S.liked.includes(p.id)?"❤️":"🤍")+' '+(p.likes||0)+'</button></div></div>';
   });
-
+return h;
 }
 
 function pgTournament(){
