@@ -2080,7 +2080,7 @@ window.reqNotif = async function(){
 };
 window.changeName = function(){if(confirm("이름을 변경할까요?")){localStorage.removeItem("golfMyName");MY_NAME="";R();}};
 
-if(MY_NAME) initNotifications();
+if(MY_NAME) initNotifications();  // 연결 끊김 감지 자동 재연결 document.addEventListener("visibilitychange", function(){   if(document.visibilityState==="visible"){     setTimeout(function(){ R(); }, 500);   } }); window.addEventListener("online", function(){   setTimeout(function(){ R(); }, 1000); });
 
 
 
