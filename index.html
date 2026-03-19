@@ -845,7 +845,7 @@ function pgDues(){
 
   h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
   h+='<div class="sec" style="margin:0">💰 회비 관리</div>';
-  h+='<button class="btn" onclick="openModal(\''+(at==="birdies"?"addBirdie":at==="ledger"?"addLedger":"addDue")+'\')">+ '+(at==="birdies"?"버디 등록":"납부 등록")+'</button></div>';
+  h+='<button class="btn" onclick="openModal(\''+(at==="birdies"?"addBirdie":at==="ledger"?"addLedger":"addDue")+'\')">+ '+(at==="birdies"?"버디 등록":at==="ledger"?"지출 등록":"납부 등록")+'</button></div>';
   h+='<div class="tab-bar">';
   h+='<button class="tab-btn" onclick="setDuesTab(\'dues\')" style="background:'+(at==="dues"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="dues"?"#b8eab8":"#4a7a4a")+'">🏦 연회비</button>';
   h+='<button class="tab-btn" onclick="setDuesTab(\'birdies\')" style="background:'+(at==="birdies"?"#2a5a2a":"#0d1a0d")+';color:'+(at==="birdies"?"#b8eab8":"#4a7a4a")+'">🐦 버디값</button>';
