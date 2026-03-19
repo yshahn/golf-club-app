@@ -830,7 +830,7 @@ function pgDues(){
   var tbu=S.birdies.filter(b=>!b.paid).reduce((a,b)=>a+b.amount,0);
   var tbt=S.birdies.reduce((a,b)=>a+b.count,0);
 
-  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+  h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
   h+='<div class="sec" style="margin:0">💰 회비 관리</div>';
   h+='<button class="btn" onclick="openModal(\''+(at==="birdies"?"addBirdie":at==="ledger"?"addLedger":"addDue")+'\')">+ '+(at==="birdies"?"버디 등록":"납부 등록")+'</button></div>';
   h+='<div class="tab-bar">';
