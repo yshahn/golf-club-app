@@ -54,6 +54,9 @@
     .tab-bar{display:flex;border:1px solid #2a4a2a;border-radius:10px;overflow:hidden;margin-bottom:14px}
     .tab-btn{flex:1;padding:10px;font-size:13px;font-family:sans-serif;cursor:pointer;border:none}
     .info-box{background:#0d2b0d;border-radius:8px;padding:10px;margin-bottom:8px;font-family:sans-serif;font-size:12px;color:#7dba7d;line-height:1.6}
+  .fs-small{font-size:14px!important}
+  .fs-medium{font-size:16px!important}
+  .fs-large{font-size:19px!important}
   </style>
 </head>
 <body>
@@ -97,6 +100,8 @@ const db = getFirestore(fbapp);
 const storage = getStorage(fbapp);
 
 let MY_NAME = localStorage.getItem("golfMyName") || "";
+var FONT_SIZE = localStorage.getItem("golfFontSize") || "medium";
+document.body.classList.add("fs-"+FONT_SIZE);
 
 let S = {
   tab:"home", somSelected:[], somSize:4, somResult:null, somMode:"random", tournamentTab:"list",
@@ -589,7 +594,15 @@ function pgHome(cu,upcoming){
   h+='<span style="font-size:20px;color:#7dacff">→</span></div></div>';
 
   h+='<div style="display:flex;justify-content:center;gap:16px;margin-top:8px">';
-  h+='<button onclick="changeName()" style="background:none;border:none;color:#4a7a4a;font-family:sans-serif;font-size:12px;cursor:pointer;text-decoration:underline">👤 이름 변경 (현재: '+MY_NAME+')</button>';
+  h+='<div style="display:flex;justify-content:center;gap:8px;margin-bottom:8px">';
+h+='<div style="font-size:12px;color:#4a7a4a;font-family:sans-serif;padding-top:6px">글씨 크기:</div>';
+["small","medium","large"].forEach(function(sz){
+  var label=sz==="small"?"작게":sz==="medium"?"보통":"크게";
+  var sel=FONT_SIZE===sz;
+  h+='<button onclick="setFontSize(\''+sz+'\')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-family:sans-serif;cursor:pointer;border:1px solid '+(sel?'#7dba7d':'#2a4a2a')+';background:'+(sel?'#1a3a1a':'#0d1a0d')+';color:'+(sel?'#7dba7d':'#4a7a4a')+'">'+label+'</button>';
+});
+h+='</div>';
+h+='<button onclick="changeName()" style="background:none;border:none;color:#4a7a4a;font-family:sans-serif;font-size:12px;cursor:pointer;text-decoration:underline">👤 이름 변경 (현재: '+MY_NAME+')</button>';
   var notifGranted=(typeof Notification!=='undefined'&&Notification.permission==='granted');
   h+='<button onclick="reqNotif()" style="background:none;border:none;font-family:sans-serif;font-size:12px;cursor:pointer;color:'+(notifGranted?'#7dba7d':'#ffaa44')+';text-decoration:underline">'+(notifGranted?'🔔 알림 켜짐':'🔕 알림 허용')+'</button>';
   h+='</div>';
@@ -2079,6 +2092,13 @@ window.reqNotif = async function(){
   } else {
     alert("알림을 허용해 주세요!\n브라우저 설정 → 사이트 설정 → 알림 허용");
   }
+  R();
+};
+window.setFontSize = function(sz){
+  document.body.classList.remove("fs-small","fs-medium","fs-large");
+  document.body.classList.add("fs-"+sz);
+  FONT_SIZE=sz;
+  localStorage.setItem("golfFontSize",sz);
   R();
 };
 window.changeName = function(){if(confirm("이름을 변경할까요?")){localStorage.removeItem("golfMyName");MY_NAME="";R();}};
