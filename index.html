@@ -2095,9 +2095,9 @@ window.reqNotif = async function(){
   R();
 };
 window.setFontSize = function(sz){
-  var sizeMap={"small":"0.85","medium":"1","large":"1.2"};
-  var rem=sizeMap[sz]||"1";
-  document.documentElement.style.fontSize=rem+"rem";
+  var sizeMap={"small":"90%","medium":"100%","large":"120%"};
+  var scale=sizeMap[sz]||"100%";
+  document.getElementById("app").style.zoom=scale;
   FONT_SIZE=sz;
   localStorage.setItem("golfFontSize",sz);
   R();
