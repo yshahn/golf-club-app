@@ -100,8 +100,8 @@ const db = getFirestore(fbapp);
 const storage = getStorage(fbapp);
 
 let MY_NAME = localStorage.getItem("golfMyName") || "";
-var FONT_SIZE = localStorage.getItem("golfFontSize") || "medium";
-document.body.classList.add("fs-"+FONT_SIZE);
+var FONT_SIZE = localStorage.getItem("golfFontSize") || "1";
+document.documentElement.style.fontSize = parseFloat(FONT_SIZE)+"rem";
 
 let S = {
   tab:"home", somSelected:[], somSize:4, somResult:null, somMode:"random", tournamentTab:"list",
@@ -2095,8 +2095,9 @@ window.reqNotif = async function(){
   R();
 };
 window.setFontSize = function(sz){
-  document.body.classList.remove("fs-small","fs-medium","fs-large");
-  document.body.classList.add("fs-"+sz);
+  var sizeMap={"small":"0.85","medium":"1","large":"1.2"};
+  var rem=sizeMap[sz]||"1";
+  document.documentElement.style.fontSize=rem+"rem";
   FONT_SIZE=sz;
   localStorage.setItem("golfFontSize",sz);
   R();
